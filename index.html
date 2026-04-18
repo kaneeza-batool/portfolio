@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Kaneeza Batool — Frontend Developer portfolio."
+    />
+    <title>Kaneeza Batool | Frontend Developer Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- PAGE LOADER -->
+    <div id="page-loader" aria-hidden="true">
+      <div class="loader-inner">
+        <div class="loader-logo">Kaneeza Batool<span class="loader-dot">.</span></div>
+        <div class="loader-bar"><div class="loader-fill"></div></div>
+        <p class="loader-sub">Loading portfolio…</p>
+      </div>
+    </div>
+
+    <!-- CUSTOM CURSOR -->
+    <div id="cursor-dot" class="cursor-dot" aria-hidden="true"></div>
+    <div id="cursor-ring" class="cursor-ring" aria-hidden="true"></div>
+
+    <!-- AMBIENT BLOBS -->
+    <div class="ambient-blobs" aria-hidden="true">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
+    </div>
+
+    <div
+      id="progress-bar"
+      role="progressbar"
+      aria-label="Scroll progress"
+    ></div>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Header -->
+    <header class="header" id="header">
+      <a href="#home" class="logo" aria-label="Kaneeza Batool — Home"
+        >Kaneeza Batool<span class="logo-dot">.</span></a
+      >
+      <button
+        class="menu-toggle"
+        id="menu-icon"
+        aria-label="Toggle navigation"
+        aria-expanded="false"
+        aria-controls="main-nav"
+      >
+        <i class="bi bi-list"></i>
+      </button>
+      <nav id="main-nav" role="navigation" aria-label="Main navigation">
+        <a href="#home" class="nav-link active">Home</a>
+        <a href="#about" class="nav-link">About</a>
+        <a href="#education" class="nav-link">Education</a>
+        <a href="#skills" class="nav-link">Skills</a>
+        <a href="#portfolio" class="nav-link">Projects</a>
+        <a href="#contact" class="nav-link">Contact</a>
+      </nav>
+    </header>
+
+    <main id="main-content">
+      <!-- HOME -->
+      <section class="home" id="home">
+        <canvas
+          id="hero-canvas"
+          class="hero-canvas"
+          aria-hidden="true"
+        ></canvas>
+        <div class="home-detail">
+          <div class="home-greeting">
+            <span class="greeting-line"></span>
+            <span class="greeting-text">Hello, World 👋</span>
+          </div>
+          <h1 class="scramble-text" data-original="Kaneeza Batool">
+            Kaneeza Batool
+          </h1>
+          <h2>
+            I'm a
+            <span class="typed-text" data-text="Frontend Developer"
+              >Frontend Developer</span
+            >
+          </h2>
+          <p>
+            I'm Kaneeza Batool, a Computer Science student and frontend web
+            development trainee at the Saylani Mass IT Program. I build
+            responsive, user-friendly interfaces using HTML, CSS, Bootstrap, and
+            JavaScript.
+          </p>
+
+          <div class="hero-stats">
+            <div class="stat-item">
+              <span class="stat-num">7+</span>
+              <span class="stat-label">Projects</span>
+            </div>
+            <div class="stat-divider" aria-hidden="true"></div>
+            <div class="stat-item">
+              <span class="stat-num">2+</span>
+              <span class="stat-label">Certifications</span>
+            </div>
+            <div class="stat-divider" aria-hidden="true"></div>
+            <div class="stat-item">
+              <span class="stat-num">4th</span>
+              <span class="stat-label">Semester CS</span>
+            </div>
+          </div>
+
+          <div class="btn-sci">
+            <a href="#" class="btn btn-primary magnetic-btn"
+              ><i class="bi bi-download"></i> Download CV</a
+            >
+            <div class="social-links">
+              <a
+                href="https://github.com/kaneeza-batool"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GitHub"
+                class="magnetic-icon"
+                ><i class="bi bi-github"></i
+              ></a>
+              <a
+                href="https://www.linkedin.com/in/kaneeza-batool/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                class="magnetic-icon"
+                ><i class="bi bi-linkedin"></i
+              ></a>
+              <a
+                href="mailto:kaneezabatool5@gmail.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Email"
+                class="magnetic-icon"
+                ><i class="bi bi-envelope"></i
+              ></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="home-img">
+          <div class="img-box">
+            <div class="img-item">
+              <img
+                src="kaneeza.png"
+                alt="Portrait of Kaneeza Batool"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABOUT -->
+      <section class="about section-reveal" id="about">
+        <h2 class="heading reveal-heading">
+          About <span class="accent">Me</span>
+        </h2>
+        <div class="about-content">
+          <div class="about-card tilt-card">
+            <div class="about-icon-row" aria-hidden="true">
+              <span class="about-icon"><i class="bi bi-code-slash"></i></span>
+              <span class="about-icon"><i class="bi bi-palette"></i></span>
+              <span class="about-icon"><i class="bi bi-laptop"></i></span>
+            </div>
+            <p>
+              I'm a Computer Science student and a frontend web developer
+              focused on building clean, responsive, and user-friendly web
+              interfaces. I enjoy turning ideas into real, functional websites
+              using modern web technologies.
+            </p>
+            <p>
+              Currently, I'm training at the Saylani Mass IT Program (SMIT),
+              where I'm strengthening my skills in HTML, CSS, Bootstrap, and
+              JavaScript through hands-on projects and real-world practice.
+            </p>
+            <p>
+              My goal is to grow into a professional frontend developer,
+              contribute to meaningful projects, and continuously improve my
+              problem-solving and development skills.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- EDUCATION -->
+      <section class="education section-reveal" id="education">
+        <h2 class="heading reveal-heading">
+          My <span class="accent">Journey</span>
+        </h2>
+        <div class="education-row">
+          <div class="education-column">
+            <h3 class="column-title">
+              <i class="bi bi-mortarboard"></i> Education
+            </h3>
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="timeline-dot"><span class="dot-pulse"></span></div>
+                <div class="timeline-card tilt-card">
+                  <span class="timeline-date"
+                    ><i class="bi bi-calendar3"></i> 2024 – 2028</span
+                  >
+                  <h3>BS Computer Science — IBA Sukkur University</h3>
+                  <p>
+                    Pursuing a BS in Computer Science with a focus on both
+                    theoretical understanding and practical development.
+                    Actively applying coursework through real projects and
+                    external training programs.
+                  </p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot"><span class="dot-pulse"></span></div>
+                <div class="timeline-card tilt-card">
+                  <span class="timeline-date"
+                    ><i class="bi bi-calendar3"></i> 2021 – 2023</span
+                  >
+                  <h3>Intermediate — Pre-Medical</h3>
+                  <p>
+                    Completed Intermediate in Pre-Medical from IBA Public School
+                    & College, Sukkur. Built analytical thinking and study
+                    discipline that continues to shape my approach to
+                    problem-solving in tech.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="education-column">
+            <h3 class="column-title">
+              <i class="bi bi-briefcase"></i> Experience
+            </h3>
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="timeline-dot"><span class="dot-pulse"></span></div>
+                <div class="timeline-card tilt-card">
+                  <span class="timeline-date"
+                    ><i class="bi bi-calendar3"></i> 2025 – Present</span
+                  >
+                  <h3>Modern Web & App Trainee — SMIT</h3>
+                  <p>
+                    Enrolled in SMIT's Modern Web & App Development track.
+                    Building real interfaces and developing practical frontend
+                    skills beyond classroom theory.
+                  </p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot"><span class="dot-pulse"></span></div>
+                <div class="timeline-card tilt-card">
+                  <span class="timeline-date"
+                    ><i class="bi bi-calendar3"></i> 2025</span
+                  >
+                  <h3>Speed Programming — 3rd Place</h3>
+                  <p>
+                    Secured 3rd position in SMIT's Speed Programming
+                    Competition. Built the Edvora website with HTML, CSS, and
+                    Bootstrap under time pressure.
+                  </p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot"><span class="dot-pulse"></span></div>
+                <div class="timeline-card tilt-card">
+                  <span class="timeline-date"
+                    ><i class="bi bi-calendar3"></i> 2025</span
+                  >
+                  <h3>Web Development Bootcamp — WPBridge</h3>
+                  <p>
+                    Completed an intensive web development bootcamp through
+                    WPBridge, reinforcing frontend fundamentals through hands-on
+                    project work.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SKILLS -->
+      <section class="skills section-reveal" id="skills">
+        <h2 class="heading reveal-heading">
+          My <span class="accent">Skills</span>
+        </h2>
+        <div class="skills-grid">
+          <div class="skill-group tilt-card">
+            <h3><i class="bi bi-code-slash"></i> Frontend</h3>
+            <div class="skill-tags">
+              <span class="skill-tag"
+                ><i class="bi bi-filetype-html"></i> HTML5
+                <b class="skill-pct" data-target="90">90%</b></span
+              >
+              <span class="skill-tag"
+                ><i class="bi bi-filetype-css"></i> CSS3
+                <b class="skill-pct" data-target="90">90%</b></span
+              >
+              <span class="skill-tag"
+                ><i class="bi bi-bootstrap"></i> Bootstrap
+                <b class="skill-pct" data-target="80">80%</b></span
+              >
+              <span class="skill-tag"
+                ><i class="bi bi-filetype-js"></i> JavaScript
+                <b class="skill-pct" data-target="75">75%</b></span
+              >
+            </div>
+          </div>
+          <div class="skill-group tilt-card">
+            <h3><i class="bi bi-palette"></i> Professional</h3>
+            <div class="skill-tags">
+              <span class="skill-tag"
+                ><i class="bi bi-brush"></i> Web Design
+                <b class="skill-pct" data-target="85">85%</b></span
+              >
+              <span class="skill-tag"
+                ><i class="bi bi-window-stack"></i> Frontend Dev
+                <b class="skill-pct" data-target="70">70%</b></span
+              >
+              <span class="skill-tag"
+                ><i class="bi bi-phone"></i> Responsive Design
+                <b class="skill-pct" data-target="80">80%</b></span
+              >
+              <span class="skill-tag"
+                ><i class="bi bi-git"></i> Git & GitHub
+                <b class="skill-pct" data-target="65">65%</b></span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PORTFOLIO -->
+      <section class="portfolio section-reveal" id="portfolio">
+        <h2 class="heading reveal-heading">
+          Latest <span class="accent">Projects</span>
+        </h2>
+        <div class="portfolio-container">
+          <div class="portfolio-details-panel">
+            <div class="portfolio-detail active" data-index="0">
+              <span class="project-number">01</span>
+              <h3 class="project-title">House Construction Landing Page</h3>
+              <p class="project-desc">
+                A fully responsive landing page designed for a construction
+                business. Implemented Bootstrap grid layouts, optimised for
+                mobile devices, focused on clear service presentation and
+                navigation.
+              </p>
+              <div class="project-tech">
+                <span>HTML5</span><span>CSS3</span><span>Bootstrap</span>
+              </div>
+              <div class="project-links">
+                <a
+                  href="https://github.com/kaneeza-batool/house-construction-landing-page"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-github"
+                  ><i class="bi bi-github"></i> View on GitHub</a
+                >
+              </div>
+            </div>
+            <div class="portfolio-detail" data-index="1">
+              <span class="project-number">02</span>
+              <h3 class="project-title">Currency Converter</h3>
+              <p class="project-desc">
+                Fetches real-time exchange rates via API. Built with JavaScript
+                to handle async data, DOM updates, and user input validation.
+              </p>
+              <div class="project-tech">
+                <span>HTML5</span><span>CSS3</span><span>JavaScript</span>
+              </div>
+              <div class="project-links">
+                <a
+                  href="https://github.com/kaneeza-batool/currency-converter"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-github"
+                  ><i class="bi bi-github"></i> View on GitHub</a
+                >
+              </div>
+            </div>
+            <div class="portfolio-detail" data-index="2">
+              <span class="project-number">03</span>
+              <h3 class="project-title">Taj Restaurant Website</h3>
+              <p class="project-desc">
+                Multi-section restaurant website with menu, booking, and about
+                sections. Focused on semantic HTML structure and user-friendly
+                layout.
+              </p>
+              <div class="project-tech"><span>HTML5</span></div>
+              <div class="project-links">
+                <a
+                  href="https://github.com/kaneeza-batool/taj-restaurant-website"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-github"
+                  ><i class="bi bi-github"></i> View on GitHub</a
+                >
+              </div>
+            </div>
+            <div class="portfolio-detail" data-index="3">
+              <span class="project-number">04</span>
+              <h3 class="project-title">Edvora Website</h3>
+              <p class="project-desc">
+                Built during a speed programming competition under time
+                constraints. Responsive UI using Bootstrap — fast
+                problem-solving under pressure.
+              </p>
+              <div class="project-tech">
+                <span>HTML5</span><span>CSS3</span><span>Bootstrap</span>
+              </div>
+              <div class="project-links">
+                <a
+                  href="https://github.com/kaneeza-batool/edvora-website-speed-challenge"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-github"
+                  ><i class="bi bi-github"></i> View on GitHub</a
+                >
+              </div>
+            </div>
+            <div class="portfolio-detail" data-index="4">
+              <span class="project-number">05</span>
+              <h3 class="project-title">Image Slider</h3>
+              <p class="project-desc">
+                Custom-built slider in pure JavaScript. Smooth transitions,
+                navigation controls, and dynamic DOM manipulation — no
+                libraries.
+              </p>
+              <div class="project-tech">
+                <span>HTML5</span><span>CSS3</span><span>JavaScript</span>
+              </div>
+              <div class="project-links">
+                <a
+                  href="https://github.com/kaneeza-batool/modern-image-slider"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-github"
+                  ><i class="bi bi-github"></i> View on GitHub</a
+                >
+              </div>
+            </div>
+            <div class="portfolio-detail" data-index="5">
+              <span class="project-number">06</span>
+              <h3 class="project-title">Theme Toggle</h3>
+              <p class="project-desc">
+                Light/dark mode toggle using JavaScript closures. Demonstrates
+                state management and interactive UI behaviour with clean
+                transitions.
+              </p>
+              <div class="project-tech">
+                <span>HTML5</span><span>CSS3</span><span>JavaScript</span>
+              </div>
+              <div class="project-links">
+                <a
+                  href="https://github.com/kaneeza-batool/theme-toggle-project"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-github"
+                  ><i class="bi bi-github"></i> View on GitHub</a
+                >
+              </div>
+            </div>
+            <div class="portfolio-detail" data-index="6">
+              <span class="project-number">07</span>
+              <h3 class="project-title">Calculator</h3>
+              <p class="project-desc">
+                Minimal calculator interface supporting basic arithmetic. Clean
+                layout and user-friendly interaction patterns.
+              </p>
+              <div class="project-tech">
+                <span>HTML5</span><span>CSS3</span>
+              </div>
+              <div class="project-links">
+                <a
+                  href="https://github.com/kaneeza-batool/calculator"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-github"
+                  ><i class="bi bi-github"></i> View on GitHub</a
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="portfolio-carousel-panel">
+            <div class="portfolio-carousel">
+              <div class="img-slide" id="img-slide">
+                <div class="img-item">
+                  <img
+                    src="images/portfolio1.png"
+                    alt="House Construction"
+                    loading="lazy"
+                  />
+                </div>
+                <div class="img-item">
+                  <img
+                    src="images/portfolio2.png"
+                    alt="Currency Converter"
+                    loading="lazy"
+                  />
+                </div>
+                <div class="img-item">
+                  <img
+                    src="images/portfolio3.png"
+                    alt="Taj Restaurant"
+                    loading="lazy"
+                  />
+                </div>
+                <div class="img-item">
+                  <img
+                    src="images/portfolio4.png"
+                    alt="Edvora Website"
+                    loading="lazy"
+                  />
+                </div>
+                <div class="img-item">
+                  <img
+                    src="images/portfolio5.jpg"
+                    alt="Image Slider"
+                    loading="lazy"
+                  />
+                </div>
+                <div class="img-item">
+                  <img
+                    src="images/portfolio6.jpg"
+                    alt="Theme Toggle"
+                    loading="lazy"
+                  />
+                </div>
+                <div class="img-item">
+                  <img
+                    src="images/portfolio7.jpg"
+                    alt="Calculator"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="carousel-nav">
+              <div class="carousel-dots" id="carousel-dots"></div>
+              <div class="carousel-arrows">
+                <button
+                  class="carousel-btn arrow-left disabled"
+                  aria-label="Previous project"
+                >
+                  <i class="bi bi-chevron-left"></i>
+                </button>
+                <button
+                  class="carousel-btn arrow-right"
+                  aria-label="Next project"
+                >
+                  <i class="bi bi-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section class="contact section-reveal" id="contact">
+        <h2 class="heading reveal-heading">
+          Contact <span class="accent">Me</span>
+        </h2>
+        <form
+          action="https://formspree.io/f/your-id"
+          method="POST"
+          class="contact-form"
+          autocomplete="on"
+        >
+          <div class="form-row">
+            <div class="form-group float-label">
+              <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder=" "
+                required
+                autocomplete="name"
+              />
+              <label for="name">Full Name</label>
+            </div>
+            <div class="form-group float-label">
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder=" "
+                required
+                autocomplete="email"
+              />
+              <label for="email">Email Address</label>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group float-label">
+              <input
+                type="tel"
+                id="phone"
+                name="number"
+                placeholder=" "
+                autocomplete="tel"
+              />
+              <label for="phone">Mobile Number</label>
+            </div>
+            <div class="form-group float-label">
+              <input
+                type="text"
+                id="subject"
+                name="subject"
+                placeholder=" "
+                required
+              />
+              <label for="subject">Email Subject</label>
+            </div>
+          </div>
+          <div class="form-group form-group--full float-label">
+            <textarea
+              id="message"
+              name="message"
+              rows="8"
+              placeholder=" "
+              required
+            ></textarea>
+            <label for="message">Your Message</label>
+          </div>
+          <div class="form-submit">
+            <button type="submit" class="btn btn-primary magnetic-btn">
+              <i class="bi bi-send"></i> Send Message
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-text">
+        <p>&copy; 2026 Kaneeza Batool. All Rights Reserved.</p>
+      </div>
+      <a
+        href="#home"
+        class="footer-top-btn magnetic-icon"
+        aria-label="Scroll to top"
+        ><i class="bi bi-arrow-up"></i
+      ></a>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
