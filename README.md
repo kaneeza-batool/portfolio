@@ -11,7 +11,9 @@ Full-stack (MERN) developer moving into applied AI · CS student at Sukkur IBA, 
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=flat&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=flat&logo=vite&logoColor=white)](https://vite.dev)
-[![Cloudflare Workers](https://img.shields.io/badge/Deploys_to-Cloudflare_Workers-F38020?style=flat&logo=cloudflare&logoColor=white)](https://workers.cloudflare.com)
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed_on-Vercel-000000?style=flat&logo=vercel&logoColor=white)](https://kaneeza-batool-portfolio.vercel.app/)
+
+### [🌐 kaneeza-batool-portfolio.vercel.app](https://kaneeza-batool-portfolio.vercel.app/)
 
 [LinkedIn](https://www.linkedin.com/in/kaneeza-batool) · [GitHub](https://github.com/kaneeza-batool) · [LeetCode](https://leetcode.com/u/kaneezabatool) · [Email](mailto:kaneezabatoolmemon@gmail.com)
 
@@ -67,7 +69,7 @@ The hero shows an empty GitHub contribution graph from November 2025. As you scr
 - **Generated world map.** The dotted map was generated once with [`dotted-map`](https://www.npmjs.com/package/dotted-map) and embedded as about 600 bytes of hex. The library isn't shipped to visitors.
 - **Small details.** Sticky notes, polaroids, a corkboard, keyboard-key tool chips, a rotating stamp, a letter to my future self, and a hidden easter egg (click the avatar near the bottom of the page three times).
 - **Accessible motion.** Every animation turns off under `prefers-reduced-motion`. The page uses semantic HTML, alt text and keyboard-reachable controls throughout.
-- **Server-side rendering** with TanStack Start, deployed to the edge on Cloudflare Workers.
+- **Server-side rendering** with TanStack Start, deployed on Vercel.
 
 ## Tech stack
 
@@ -79,7 +81,7 @@ The hero shows an empty GitHub contribution graph from November 2025. As you scr
 | Typography | Fraunces (display), Inter (body), JetBrains Mono (code), Caveat (handwriting) |
 | Icons | lucide-react |
 | Build | Vite 8 |
-| Deploy | Nitro, targeting Cloudflare Workers (other hosts are supported through presets) |
+| Hosting | Vercel, built through Nitro (which also supports other hosts through presets) |
 | Quality | ESLint, Prettier, Vitest and Testing Library |
 
 ## Getting started
@@ -87,8 +89,8 @@ The hero shows an empty GitHub contribution graph from November 2025. As you scr
 **Prerequisites:** Node.js 20+ and npm.
 
 ```sh
-git clone https://github.com/kaneeza-batool/<this-repo>.git
-cd <this-repo>
+git clone https://github.com/kaneeza-batool/portfolio.git
+cd portfolio
 npm install
 npm run dev        # http://localhost:8080
 ```
@@ -98,23 +100,25 @@ npm run dev        # http://localhost:8080
 | Command | What it does |
 | --- | --- |
 | `npm run dev` | Starts the dev server with hot reload on port 8080 |
-| `npm run build` | Production build in `.output/` (Cloudflare Workers by default) |
+| `npm run build` | Production build in `.output/` (targets Vercel when built on Vercel) |
 | `npm run test` | Runs the test suite once with Vitest |
 | `npm run lint` | Lints the project with ESLint |
 | `npm run format` | Formats the codebase with Prettier |
 
 ## Deployment
 
-`npm run build` produces a Cloudflare Workers bundle in `.output/`. To deploy it:
+The site is live at **[kaneeza-batool-portfolio.vercel.app](https://kaneeza-batool-portfolio.vercel.app/)** and deploys automatically from this repository on Vercel:
+
+- **Every push to `main`** triggers a production deployment.
+- **Pull requests** get their own preview URL.
+- **No `vercel.json` is needed.** Nitro detects the Vercel build environment and outputs the right format, and Vercel's default settings (`npm install`, `npm run build`) work as they are.
+
+To deploy your own copy, import the repo at [vercel.com/new](https://vercel.com/new) and keep the defaults.
+
+To deploy somewhere else instead, set a [Nitro preset](https://nitro.build/deploy) when you build:
 
 ```sh
-npx nitro deploy --prebuilt
-```
-
-To target a different host, set a [Nitro preset](https://nitro.build/deploy) when you build:
-
-```sh
-NITRO_PRESET=vercel npm run build       # or netlify, node-server, ...
+NITRO_PRESET=netlify npm run build      # or cloudflare-module, node-server, ...
 ```
 
 To test a production build locally:
