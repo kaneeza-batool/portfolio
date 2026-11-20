@@ -12,3 +12,5 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+Sitemap: https://kaneeza-batool-portfolio.vercel.app/sitemap.xml

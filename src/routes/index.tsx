@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Children, useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { toast } from "sonner";
 import {
   ArrowUpRight,
@@ -7,37 +7,69 @@ import {
   Brain,
   Briefcase,
   Code2,
-  Coffee,
+  Download,
+  GitMerge,
   Github,
-  Globe,
   GraduationCap,
-  Headphones,
   Linkedin,
   Mail,
   MapPin,
-  Package,
-  Rocket,
+  Megaphone,
+  MessagesSquare,
   Sparkles,
   Trophy,
   Users,
 } from "lucide-react";
-import avatar from "@/assets/kaneeza-avatar.png";
+import avatar from "@/assets/kaneeza-avatar.webp";
 import {
   AgentGraph,
   AuraScreen,
   BrowserFrame,
+  DailyVisual,
   DexoScreen,
   ElderScreen,
+  FellowshipPath,
   FirstPortfolioScreen,
   JssScreen,
+  NexFellowTrack,
   PakLawScreen,
+  PrScreen,
   TitanScreen,
   WorldMap,
 } from "@/components/visuals";
-
-const TITLE = "Kaneeza Batool | MERN developer moving into AI";
-const DESC =
-  "Kaneeza Batool is a CS student at Sukkur IBA building full-stack web apps and applied AI. The story, the projects and how to reach her.";
+import {
+  CV_URL,
+  DESC,
+  EMAIL,
+  GH,
+  LINKS,
+  SITE_URL,
+  TITLE,
+  TYPED,
+  allProjects,
+  aura,
+  aws,
+  certificates,
+  chapters,
+  communityRoles,
+  followRepos,
+  letter,
+  marquee,
+  orgs,
+  payoffStats,
+  terminal,
+  toolsBuild,
+  toolsLearn,
+  type Kind,
+  type OrgVisual,
+  type Project,
+} from "@/content";
+import { useGitHub, useSukkurTemp, type Day, type GitHubData } from "@/lib/live-data";
+import { GRAPH_HEX } from "@/lib/graph-colors";
+import { Skyline } from "@/components/skyline";
+import { AboutMe } from "@/components/about-me";
+import { CurrentlyCard } from "@/components/currently-card";
+import { InkStamp, MiniStamp } from "@/components/stamps";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -46,424 +78,47 @@ export const Route = createFileRoute("/")({
       { name: "description", content: DESC },
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESC },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:url", content: `${SITE_URL}/` },
+      { property: "og:image", content: `${SITE_URL}/og-image.png` },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      {
+        property: "og:image:alt",
+        content: "Kaneeza Batool: It was supposed to be one homework assignment.",
+      },
+      { name: "twitter:title", content: TITLE },
+      { name: "twitter:description", content: DESC },
+      { name: "twitter:image", content: `${SITE_URL}/og-image.png` },
+    ],
+    links: [
+      { rel: "canonical", href: `${SITE_URL}/` },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+    ],
+    // Structured data so search engines can show a "person" result with these profiles.
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Person",
+          name: "Kaneeza Batool",
+          url: `${SITE_URL}/`,
+          image: `${SITE_URL}/og-image.png`,
+          description: DESC,
+          jobTitle: "Computer science student and full-stack developer",
+          affiliation: { "@type": "CollegeOrUniversity", name: "Sukkur IBA University" },
+          address: { "@type": "PostalAddress", addressLocality: "Sukkur", addressCountry: "PK" },
+          knowsAbout: ["React", "Node.js", "MongoDB", "TypeScript", "Applied AI", "RAG"],
+          sameAs: [LINKS.github, LINKS.linkedin, LINKS.leetcode],
+        }),
+      },
     ],
   }),
   component: Index,
 });
 
-const GH = "kaneeza-batool";
-const EMAIL = "kaneezabatoolmemon@gmail.com";
-const LINKS = [
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/kaneeza-batool", Icon: Linkedin },
-  { label: "GitHub", href: "https://github.com/kaneeza-batool", Icon: Github },
-  { label: "LeetCode", href: "https://leetcode.com/u/kaneezabatool", Icon: Code2 },
-];
-
-/* ---------- Data ---------- */
-type Kind = "ai" | "web";
-type Project = {
-  title: string;
-  kind: Kind;
-  what?: string;
-  role?: string;
-  team?: string;
-  result?: string;
-  context?: string;
-  tags: string[];
-  live?: string | undefined;
-  github?: string | undefined;
-};
-
-const titan: Project = {
-  title: "TITAN",
-  kind: "web",
-  what: "Multi-portal institute management system. Public site plus student, trainer, super admin and campus admin portals. Role-based access per module, QR attendance with generated ID cards, a job portal with applicant matching, and automated absence and payment alerts.",
-  team: "Team of 6",
-  result: "1st place, Batch 1, Project Excellence Award (Saylani Mass IT Training, Aug 2026).",
-  tags: ["React", "Node.js", "RBAC", "Vercel"],
-  github: "https://github.com/kaneeza-batool/saylani-portal-fyp",
-};
-const jss: Project = {
-  title: "JobSkillShare redesign",
-  kind: "web",
-  what: "Internship work on a live site at EdTech4D (two months).",
-  role: "Audited the site, wrote UX reports on usability and accessibility gaps, rebuilt the homepage and Programs page as responsive prototypes, and led the team for one delivery cycle.",
-  result: "Top 5 portfolio in the cohort.",
-  tags: ["HTML", "CSS", "JavaScript", "UX audit"],
-  github: "https://github.com/kaneeza-batool/JSS-Internship",
-};
-const aura: Project = {
-  title: "auraCheck",
-  kind: "ai",
-  what: "Voice mock-interview platform. Five AI agents run a live interview, ask follow-ups, and check answers against the candidate's resume and GitHub. A judge agent writes a scorecard you can download as a PDF. Three services: React frontend on Vercel, Node/Express API with auth and SQLite, Python agent service on Railway's private network.",
-  role: "I worked on the Python FastAPI + CrewAI engine that runs the five-agent interview panel.",
-  team: "Team of 4, Gradient Gang",
-  context:
-    "Built at DoraHacks 2.0 (500 teams selected from 6,000+ applications, 35+ countries) through the GWY Fellowship 2.0.",
-  result: "Top 50 in the hackathon, #32 on Product Hunt on launch day, $800 in rewards.",
-  tags: ["React", "TypeScript", "Node.js", "WebSockets", "Python", "FastAPI", "CrewAI"],
-  live: "https://auracheck-taupe.vercel.app",
-  github: "https://github.com/kaneeza-batool/auraCheck",
-};
-const paklaw: Project = {
-  title: "PakLawAI",
-  kind: "ai",
-  what: "Legal Q&A assistant for Pakistani law. Ask a legal question, get an answer that cites the relevant Act and Section, built on retrieval over Pakistani legal texts.",
-  role: "I built the frontend and the legal text pipeline (sourcing, extracting and cleaning the law texts for retrieval).",
-  team: "Team of 5",
-  result: "AuratTech AI Engineering Fellowship (Jul to Sep 2026), 1st in cluster.",
-  tags: ["React", "RAG", "Data pipeline"],
-};
-const elder: Project = {
-  title: "ElderBridge",
-  kind: "ai",
-  what: "AI companion for elderly Pakistanis. Reads screens, flags scams, explains government forms in plain language.",
-  role: "I built the frontend.",
-  team: "Team of 2",
-  result: "USAII Global AI Hackathon 2026, Round 2 of 324 teams.",
-  tags: ["Frontend", "UI/UX"],
-  github: "https://github.com/Yusra-Shah/ElderBridge-Guardianos",
-};
-const dexo: Project = {
-  title: "Dexo.pk",
-  kind: "web",
-  what: "Multi-page e-commerce frontend for a luxury home decor brand. Home, Shop, About and Contact pages, with product listings grouped into category sections.",
-  role: "Built the frontend with a focus on clean layout, responsive design and a smooth experience on mobile, tablet and desktop.",
-  tags: ["HTML", "CSS", "JavaScript", "Responsive"],
-  live: "https://dexopk.netlify.app",
-  github: "https://github.com/kaneeza-batool/dexo.pk",
-};
-const allProjects = [aura, titan, paklaw, elder, jss, dexo];
-
-const SCREENS: Record<string, () => ReactNode> = {
-  auraCheck: () => <AuraScreen />,
-  TITAN: () => <TitanScreen />,
-  PakLawAI: () => <PakLawScreen />,
-  ElderBridge: () => <ElderScreen />,
-  "JobSkillShare redesign": () => <JssScreen />,
-  "Dexo.pk": () => <DexoScreen />,
-};
-const Screen = ({ p }: { p: Project }) => <>{SCREENS[p.title]?.()}</>;
-
-type Chapter = {
-  label: string;
-  date: string;
-  title: string;
-  lines?: string[];
-  featured?: Project;
-  projects?: Project[];
-  note?: string;
-  badges?: string[];
-  fellowship?: boolean;
-  bubble: string;
-  stat?: string;
-  statText?: string;
-  commit: string;
-  stickies?: string[];
-  doodle?: "star" | "arrow" | "heart" | "squiggle";
-};
-const chapters: Chapter[] = [
-  {
-    label: "Chapter 1",
-    date: "Nov 2025",
-    title: "It started as homework.",
-    bubble: "this was supposed to take one evening.",
-    commit: "opened github because teacher said so",
-    doodle: "star",
-    lines: [
-      "I opened GitHub for a class assignment.",
-      "My first portfolio was plain HTML.",
-      "I didn't close the tab.",
-    ],
-  },
-  {
-    label: "Chapter 2",
-    date: "Jun – Aug 2026",
-    title: "Then I learned to ship.",
-    bubble: "first time shipping to real users.",
-    commit: "feat: learning in public",
-    doodle: "arrow",
-    projects: [titan, jss],
-    note: "AI Engineering mentee at Dev Weekends (Jun to Aug 2026).",
-  },
-  {
-    label: "Chapter 3",
-    date: "Jul – Sep 2026",
-    title: "Then I made AI do real work.",
-    bubble: "this is where it got fun.",
-    commit: "fix: motivation. add: systems",
-    doodle: "squiggle",
-    stickies: [
-      "my relationship with DSA: enemies to lovers. currently still in the enemies arc.",
-      "consistency: still working on it. chai: never missed a day.",
-    ],
-    featured: aura,
-    projects: [paklaw, elder],
-    note: "GWY Fellowship 2.0: Top 100 most active fellows. Posted daily build recaps on Instagram as @kaneeza.builds.",
-    badges: [
-      "DataCamp AI Engineer for Developers Associate",
-      "HEC Generative AI Cohort 3 Top Performer",
-      "Stanford Code in Place 2026 (completed)",
-    ],
-  },
-  {
-    label: "Chapter 4",
-    date: "Sep 2026",
-    title: "I stopped building alone.",
-    bubble: "turns out i like bringing people along.",
-    commit: "feat: bring people along",
-    doodle: "heart",
-    stat: "The first AWS Student Builder Group at Sukkur IBA.",
-    statText:
-      "The campus had never had one. I was selected as its first leader in Sep 2026 and I'm registering it with the university from zero.",
-    fellowship: true,
-  },
-];
-
-type Org = {
-  name: string;
-  short: string;
-  role: string;
-  when: string;
-  what: string;
-  result: string;
-  stats: [string, string][];
-  visual: () => ReactNode;
-};
-const orgs: Org[] = [
-  {
-    name: "AWS Student Builder Group, Sukkur IBA",
-    short: "AWS",
-    role: "Founding leader",
-    when: "Sep 2026 – now",
-    what: "The campus had never had one. I was selected as its first leader and I'm registering it with the university from zero.",
-    result: "The first AWS Student Builder Group at Sukkur IBA.",
-    stats: [
-      ["1st", "on campus"],
-      ["0 → 1", "built from zero"],
-    ],
-    visual: () => <Stamp />,
-  },
-  {
-    name: "DoraHacks 2.0",
-    short: "DH",
-    role: "Team Gradient Gang, agent engine",
-    when: "via GWY Fellowship 2.0",
-    what: aura.what ?? "",
-    result: aura.result ?? "",
-    stats: [
-      ["Top 50", "of 500 teams"],
-      ["#32", "Product Hunt"],
-      ["$800", "in rewards"],
-    ],
-    visual: () => <AuraScreen />,
-  },
-  {
-    name: "GWY Fellowship 2.0 (DoraDAO)",
-    short: "GWY",
-    role: "Fellow",
-    when: "Global, remote",
-    what: "A global fellowship for women in AI across 30+ countries. Posted daily build recaps on Instagram as @kaneeza.builds.",
-    result: "Top 100 most active fellows.",
-    stats: [
-      ["30+", "countries"],
-      ["Top 100", "most active"],
-    ],
-    visual: () => (
-      <div className="rounded-xl border border-cream/10 bg-cream p-4">
-        <WorldMap className="w-full" />
-      </div>
-    ),
-  },
-  {
-    name: "AuratTech AI Engineering Fellowship",
-    short: "AT",
-    role: "Frontend + legal text pipeline",
-    when: "Jul – Sep 2026",
-    what: paklaw.what ?? "",
-    result: "1st in cluster with PakLawAI.",
-    stats: [
-      ["1st", "in cluster"],
-      ["5", "teammates"],
-    ],
-    visual: () => <PakLawScreen />,
-  },
-  {
-    name: "Saylani Mass IT Training",
-    short: "SMIT",
-    role: "Team of 6, TITAN",
-    when: "Aug 2026",
-    what: titan.what ?? "",
-    result: "1st place, Batch 1, Project Excellence Award.",
-    stats: [
-      ["1st", "in Batch 1"],
-      ["5", "portals"],
-      ["6", "teammates"],
-    ],
-    visual: () => <TitanScreen />,
-  },
-  {
-    name: "USAII Global AI Hackathon 2026",
-    short: "USAII",
-    role: "Frontend, team of 2",
-    when: "2026",
-    what: elder.what ?? "",
-    result: "Round 2 of 324 teams with ElderBridge.",
-    stats: [
-      ["324", "teams"],
-      ["R2", "reached"],
-    ],
-    visual: () => (
-      <div className="rounded-xl bg-cream py-5">
-        <ElderScreen />
-      </div>
-    ),
-  },
-  {
-    name: "EdTech4D",
-    short: "E4D",
-    role: "Intern, led one delivery cycle",
-    when: "Two months",
-    what: jss.role ?? "",
-    result: "Top 5 portfolio in the cohort.",
-    stats: [
-      ["Top 5", "in cohort"],
-      ["2", "pages rebuilt"],
-    ],
-    visual: () => (
-      <div className="rounded-xl bg-cream p-3">
-        <JssScreen />
-      </div>
-    ),
-  },
-  {
-    name: "Dev Weekends",
-    short: "DW",
-    role: "AI Engineering mentee",
-    when: "Jun – Aug 2026",
-    what: "AI Engineering mentee while shipping my first real projects.",
-    result: "Mentored through the AI engineering track.",
-    stats: [["3", "months"]],
-    visual: () => (
-      <div className="flex aspect-video items-center justify-center rounded-xl border border-cream/10 bg-cream/5">
-        <div className="h-32 w-48">
-          <AgentGraph />
-        </div>
-      </div>
-    ),
-  },
-];
-
-const terminal = [
-  ["Learning", "Python and machine learning"],
-  ["Practicing", "Data structures and algorithms in Java, every day"],
-  ["Leading", "AWS Student Builder Group at Sukkur IBA"],
-  ["Open to", "Remote internships, open source, collaboration"],
-];
-const toolsBuild = [
-  "JavaScript",
-  "TypeScript",
-  "React",
-  "Vite",
-  "Tailwind CSS",
-  "Node.js",
-  "Express",
-  "MongoDB",
-  "MySQL",
-  "Git",
-  "Vercel",
-];
-const toolsLearn = ["Python", "pandas", "NumPy", "scikit-learn", "SQL"];
-const certificates = [
-  "AI Engineer for Developers Associate (DataCamp)",
-  "5-Day AI Agents Intensive (Kaggle)",
-  "Azure AI and Azure OpenAI Basics (Microsoft)",
-  "AI Fundamentals (IBM)",
-  "Generative AI and Responsible AI (Google Cloud)",
-  "DataCamp courses on embeddings, prompt engineering, LLMOps and Hugging Face",
-];
-
-const unfinished = [
-  "redesigned this portfolio 5 times before shipping it once.",
-  "planned a whole certificate sprint for my community. never launched it.",
-  "skipped the 24-hour AI film challenge. ran out of time.",
-];
-const smallThings = [
-  {
-    k: "headphones",
-    v: "coke studio, soft music, random playlists. silence when my brain fights the code.",
-    Icon: Headphones,
-  },
-  { k: "fuel", v: "chai. the most consistent part of my developer journey.", Icon: Coffee },
-  {
-    k: "dumbest mistake",
-    v: "committed node_modules to github. the repo was heavier than my confidence.",
-    Icon: Package,
-  },
-  { k: "friends tease me for", v: "joining every fellowship that exists.", Icon: Award },
-  {
-    k: "if nobody was grading",
-    v: "a tool that tells pakistani students which scholarships they actually qualify for.",
-    Icon: GraduationCap,
-  },
-];
-const tilt = (seed: string, i = 0) => {
-  let h = i * 7;
-  for (const ch of seed) h = (h * 31 + ch.charCodeAt(0)) % 997;
-  return ((h % 61) - 30) / 10; // -3 to 3 deg
-};
-const letter = [
-  "Dear Kaneeza,",
-  "By now I hope you've shipped an ML model that real people use, not just a notebook.",
-  "I hope the AWS group at Sukkur IBA runs fine without you in the room.",
-  "I hope you still solve one DSA problem a day, even on the days you don't feel like it.",
-  "And I hope you finally stopped rebuilding this portfolio.",
-  "If you haven't done all of it, that's okay. Just don't stop.",
-];
-
-/* ---------- Live data ---------- */
-type Day = { date: string; count: number; level: number };
-function useContributions() {
-  const [days, setDays] = useState<Day[] | null>(null);
-  const [total, setTotal] = useState<number | null>(null);
-  useEffect(() => {
-    fetch(`https://github-contributions-api.jogruber.de/v4/${GH}?y=last`)
-      .then((r) => r.json())
-      .then((d: { contributions: Day[]; total: Record<string, number> }) => {
-        setDays(d.contributions);
-        setTotal(Object.values(d.total).reduce((a, b) => a + b, 0));
-      })
-      .catch(() => setDays([]));
-  }, []);
-  // Live public repo count (GitHub REST API, no token needed; 60 req/hour per visitor IP).
-  const [repos, setRepos] = useState(REPOS_FALLBACK);
-  useEffect(() => {
-    fetch(`https://api.github.com/users/${GH}`)
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((d: { public_repos?: number }) => {
-        if (typeof d.public_repos === "number") setRepos(d.public_repos);
-      })
-      .catch(() => {});
-  }, []);
-  return { days, total, repos };
-}
-function useSukkurTemp() {
-  const [t, setT] = useState<number | null>(null);
-  useEffect(() => {
-    fetch(
-      "https://api.open-meteo.com/v1/forecast?latitude=27.7052&longitude=68.8574&current=temperature_2m",
-    )
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((d: { current?: { temperature_2m?: number } }) => {
-        const v = d.current?.temperature_2m;
-        if (typeof v === "number") setT(Math.round(v));
-      })
-      .catch(() => setT(null));
-  }, []);
-  return t;
-}
+/* ---------- Hooks ---------- */
+/** Fires once, the first time the element scrolls into view. */
 function useInView<T extends HTMLElement>(threshold = 0.2) {
   const ref = useRef<T>(null);
   const [v, setV] = useState(false);
@@ -477,12 +132,151 @@ function useInView<T extends HTMLElement>(threshold = 0.2) {
   return [ref, v] as const;
 }
 
-const LV = ["bg-g0", "bg-g1", "bg-g2", "bg-g3", "bg-g4"];
-// Shown only until the live count arrives from GitHub (or if the request fails).
-const REPOS_FALLBACK = 46;
-const TYPED = "nov 2025 · sukkur, pakistan · 0 repositories";
+/** null until mounted (server render and first paint), then whether the query matches. */
+function useMedia(query: string) {
+  const [m, setM] = useState<boolean | null>(null);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const on = () => setM(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, [query]);
+  return m;
+}
+
+/** Marks top-level sections that are off screen so CSS can pause their animations. */
+function usePauseOffscreen(root: RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    const els = root.current?.querySelectorAll<HTMLElement>(
+      ":scope > header, :scope > main > section, :scope > main > header",
+    );
+    if (!els?.length) return;
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          const el = e.target as HTMLElement;
+          if (e.isIntersecting) el.removeAttribute("data-offscreen");
+          else el.setAttribute("data-offscreen", "");
+        }),
+      { rootMargin: "150px 0px" },
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [root]);
+}
+
+/** True only for a real mouse/trackpad with motion allowed (no 3D hover effects otherwise). */
+const canHover3D = () =>
+  window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
+  !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/**
+ * Hero depth: sets --px / --py (-1…1) on the returned element from the mouse position
+ * over its <header>. Children translate/rotate by different amounts to look layered.
+ */
+function useDepth<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  useEffect(() => {
+    const el = ref.current;
+    const zone = el?.closest("header");
+    if (!el || !zone || !canHover3D()) return;
+    let raf = 0;
+    let x = 0;
+    let y = 0;
+    const apply = () => {
+      raf = 0;
+      el.style.setProperty("--px", x.toFixed(3));
+      el.style.setProperty("--py", y.toFixed(3));
+    };
+    const move = (e: PointerEvent) => {
+      const r = el.getBoundingClientRect();
+      const clamp = (v: number) => Math.max(-1, Math.min(1, v));
+      x = clamp((e.clientX - (r.left + r.width / 2)) / (r.width * 1.4));
+      y = clamp((e.clientY - (r.top + r.height / 2)) / (r.height * 1.4));
+      if (!raf) raf = requestAnimationFrame(apply);
+    };
+    const leave = () => {
+      x = 0;
+      y = 0;
+      if (!raf) raf = requestAnimationFrame(apply);
+    };
+    zone.addEventListener("pointermove", move);
+    zone.addEventListener("pointerleave", leave);
+    return () => {
+      cancelAnimationFrame(raf);
+      zone.removeEventListener("pointermove", move);
+      zone.removeEventListener("pointerleave", leave);
+    };
+  }, []);
+  return ref;
+}
+
+/**
+ * Card tilt + light sweep: any element with `data-tilt` inside `root` leans toward the
+ * mouse. One delegated listener for the whole page; styles live in styles.css.
+ */
+function useTiltCards(root: RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    const r = root.current;
+    if (!r || !canHover3D()) return;
+    let cur: HTMLElement | null = null;
+    let last: PointerEvent | null = null;
+    let raf = 0;
+    const reset = (el: HTMLElement) => {
+      el.removeAttribute("data-tilting");
+      for (const v of ["--rx", "--ry", "--gx", "--gy", "--sx", "--sy"]) el.style.removeProperty(v);
+    };
+    const apply = () => {
+      raf = 0;
+      if (!last) return;
+      const el = (last.target as Element | null)?.closest<HTMLElement>("[data-tilt]") ?? null;
+      if (el !== cur) {
+        if (cur) reset(cur);
+        cur = el;
+      }
+      if (!el) return;
+      const b = el.getBoundingClientRect();
+      const x = (last.clientX - b.left) / b.width;
+      const y = (last.clientY - b.top) / b.height;
+      // Big panels (data-tilt="soft") lean less than small cards.
+      const k = el.dataset["tilt"] === "soft" ? 0.45 : 1;
+      el.style.setProperty("--rx", `${((0.5 - y) * 12 * k).toFixed(2)}deg`);
+      el.style.setProperty("--ry", `${((x - 0.5) * 14 * k).toFixed(2)}deg`);
+      el.style.setProperty("--gx", `${(x * 100).toFixed(1)}%`);
+      el.style.setProperty("--gy", `${(y * 100).toFixed(1)}%`);
+      // Shadow falls away from the pointer, as if lit from where it is.
+      el.style.setProperty("--sx", ((0.5 - x) * 28 * k).toFixed(1));
+      el.style.setProperty("--sy", ((0.5 - y) * 18 * k).toFixed(1));
+      el.setAttribute("data-tilting", "");
+    };
+    const move = (e: PointerEvent) => {
+      last = e;
+      if (!raf) raf = requestAnimationFrame(apply);
+    };
+    const leave = () => {
+      if (cur) reset(cur);
+      cur = null;
+      last = null;
+    };
+    r.addEventListener("pointermove", move);
+    r.addEventListener("pointerleave", leave);
+    return () => {
+      cancelAnimationFrame(raf);
+      r.removeEventListener("pointermove", move);
+      r.removeEventListener("pointerleave", leave);
+    };
+  }, [root]);
+}
 
 /* ---------- Small pieces ---------- */
+
+const tilt = (seed: string, i = 0) => {
+  let h = i * 7;
+  for (const ch of seed) h = (h * 31 + ch.charCodeAt(0)) % 997;
+  return ((h % 61) - 30) / 10; // -3 to 3 deg
+};
+
 function CountUp({
   to,
   prefix = "",
@@ -527,17 +321,21 @@ function CountUp({
 function Commit({ msg, dark = false }: { msg: string; dark?: boolean }) {
   return (
     <p
-      className={`mb-2 font-mono text-[11px] break-words ${dark ? "text-cream/60" : "text-muted-foreground"}`}
+      className={`mb-2 font-mono text-[11px] break-words ${dark ? "text-cream/70" : "text-muted-foreground"}`}
     >
-      <span className="text-primary">$</span> git commit -m "{msg}"
+      <span className={dark ? "text-g2" : "text-primary-hover"}>$</span> git commit -m "{msg}"
     </p>
   );
 }
 function Sticky({ text, i = 0 }: { text: string; i?: number }) {
   return (
-    <div className="sticky-note tiltable" style={{ ["--tilt" as string]: `${tilt(text, i)}deg` }}>
-      <span className="pin" aria-hidden />
-      <p className="font-hand text-xl leading-snug">{text}</p>
+    <div
+      data-tilt
+      className="sticky-note tiltable"
+      style={{ ["--tilt" as string]: `${tilt(text, i)}deg` }}
+    >
+      <span className="pin pop-3" aria-hidden />
+      <p className="pop-2 font-hand text-xl leading-snug">{text}</p>
     </div>
   );
 }
@@ -598,11 +396,14 @@ function HandArrow({ className = "" }: { className?: string }) {
 function Guide({ line, dark = false }: { line: string; dark?: boolean }) {
   const [ref, v] = useInView<HTMLDivElement>(0.3);
   return (
-    <div ref={ref} className={`guide mb-6 flex items-center gap-3 ${v ? "visible" : ""}`}>
+    <div ref={ref} className={`guide mb-3 flex items-center gap-3 md:mb-6 ${v ? "visible" : ""}`}>
       <img
         src={avatar}
         alt=""
-        className="guide-float h-14 w-14 shrink-0 rounded-full bg-ink object-cover ring-2 ring-primary ring-offset-2 ring-offset-background"
+        width={56}
+        height={56}
+        loading="lazy"
+        className="guide-float h-10 w-10 shrink-0 rounded-full md:h-14 md:w-14 bg-ink object-cover ring-2 ring-primary ring-offset-2 ring-offset-background"
       />
       <p
         className={`relative rounded-2xl rounded-bl-sm border px-3 py-2 font-mono text-xs ${dark ? "border-cream/20 bg-cream/10 text-cream" : "border-border bg-card text-foreground"}`}
@@ -612,6 +413,86 @@ function Guide({ line, dark = false }: { line: string; dark?: boolean }) {
     </div>
   );
 }
+/**
+ * Below `md`: a horizontally swipeable row with snap points and dot indicators.
+ * From `md` up, `className` should switch it back to a grid or wrap (e.g. "md:grid ...").
+ * Each child needs its own width and "shrink-0 snap-start" (plus "md:w-auto").
+ */
+function SwipeRow({
+  label,
+  className,
+  dark = false,
+  children,
+}: {
+  label: string;
+  className: string;
+  dark?: boolean;
+  children: ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(0);
+  // Count from React children, not the DOM: no layout read while the page is starting up.
+  const count = Children.toArray(children).length;
+
+  // Only measure when the visitor actually scrolls the row (reading offsets at mount
+  // would force extra layout passes during startup).
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const kids = [...el.children] as HTMLElement[];
+      const pad = parseFloat(getComputedStyle(el).paddingLeft) || 0;
+      if (el.scrollLeft >= el.scrollWidth - el.clientWidth - 2) {
+        setActive(kids.length - 1);
+        return;
+      }
+      let best = 0;
+      let dist = Infinity;
+      kids.forEach((k, i) => {
+        const d = Math.abs(k.offsetLeft - pad - el.scrollLeft);
+        if (d < dist) {
+          dist = d;
+          best = i;
+        }
+      });
+      setActive(best);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(raf);
+      el.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
+  return (
+    <>
+      <div
+        ref={ref}
+        tabIndex={0}
+        aria-label={label}
+        className={`scrollbar-none relative flex snap-x snap-mandatory overflow-x-auto outline-none focus-visible:ring-2 focus-visible:ring-primary md:overflow-visible ${className}`}
+      >
+        {children}
+      </div>
+      {count > 1 && (
+        <div className="mt-3 flex justify-center gap-1.5 md:hidden" aria-hidden>
+          {Array.from({ length: count }, (_, i) => (
+            <span
+              key={i}
+              className={`h-1.5 rounded-full transition-all duration-300 ${i === active ? "w-5 bg-primary" : `w-1.5 ${dark ? "bg-cream/30" : "bg-g2"}`}`}
+            />
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
 function FadeIn({ children, className = "" }: { children: ReactNode; className?: string }) {
   const [ref, v] = useInView<HTMLDivElement>(0.1);
   return (
@@ -634,13 +515,22 @@ const Tag = ({ children, dark = false }: { children: ReactNode; dark?: boolean }
     {children}
   </span>
 );
-const ExtLink = ({ href, children }: { href?: string | undefined; children: ReactNode }) =>
+const ExtLink = ({
+  href,
+  label,
+  children,
+}: {
+  href?: string | undefined;
+  label: string;
+  children: ReactNode;
+}) =>
   href ? (
     <a
       href={href}
       target="_blank"
       rel="noreferrer"
-      className="inline-flex items-center gap-1 font-mono text-sm text-primary hover:text-primary-hover"
+      aria-label={label}
+      className="inline-flex min-h-8 items-center gap-1 font-mono text-sm text-primary-hover underline-offset-4 hover:underline"
     >
       {children} <ArrowUpRight className="h-3.5 w-3.5" />
     </a>
@@ -660,14 +550,16 @@ function SectionHead({
   dark?: boolean;
 }) {
   return (
-    <div className="max-w-3xl">
-      <Label className={dark ? "text-cream/60" : "text-muted-foreground"}>{eyebrow}</Label>
-      <h2 className="mt-3 font-display text-4xl leading-[1.05] font-bold md:text-6xl">
+    <div className="scroll-3d max-w-3xl">
+      <Label className={dark ? "text-cream/70" : "text-muted-foreground"}>{eyebrow}</Label>
+      <h2
+        className={`mt-3 font-display text-4xl leading-[1.05] font-bold md:text-6xl ${dark ? "extrude-dark" : "extrude"}`}
+      >
         {title}{" "}
         <span className="font-hand text-5xl font-bold text-primary md:text-7xl">{accent}</span>
       </h2>
       {sub && (
-        <p className={`mt-4 text-lg ${dark ? "text-cream/70" : "text-muted-foreground"}`}>{sub}</p>
+        <p className={`mt-4 text-lg ${dark ? "text-cream/75" : "text-muted-foreground"}`}>{sub}</p>
       )}
     </div>
   );
@@ -675,34 +567,78 @@ function SectionHead({
 
 /* ---------- Nav ---------- */
 function Nav() {
+  // Phones only fit four links: "Story" (right after the hero) hides below sm.
+  const links: { l: string; h: string; ext?: boolean; wide?: boolean }[] = [
+    { l: "Story", h: "#story", wide: true },
+    { l: "About", h: "#about" },
+    { l: "Journey", h: "#journey" },
+    { l: "Work", h: "#work" },
+    { l: "Resume", h: CV_URL, ext: true },
+  ];
+  // Switch to a dark glass look while a dark section (or the footer) is behind the bar.
+  const [onDark, setOnDark] = useState(false);
+  useEffect(() => {
+    const els = document.querySelectorAll("main > section.grain-ink, footer");
+    if (!els.length) return;
+    const under = new Set<Element>();
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => (e.isIntersecting ? under.add(e.target) : under.delete(e.target)));
+        setOnDark(under.size > 0);
+      },
+      // A thin strip at the height of the bar.
+      { rootMargin: "-36px 0px -94% 0px" },
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
   return (
-    <nav className="sticky top-3 z-40 px-3">
-      <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 rounded-full border border-border bg-background/85 py-1.5 pr-2 pl-1.5 shadow-soft backdrop-blur">
-        <a href="#top" className="flex items-center gap-2 font-display text-base font-bold">
-          <img src={avatar} alt="" className="h-8 w-8 rounded-full bg-ink object-cover" />
-          <span className="hidden sm:inline">Kaneeza Batool</span>
+    <nav aria-label="Main" className="sticky top-3 z-40 px-3">
+      <div className="scroll-progress" aria-hidden />
+      <div
+        data-dark={onDark || undefined}
+        className={`mx-auto flex max-w-4xl items-center justify-between gap-2 rounded-full border py-1.5 pr-1.5 pl-1.5 backdrop-blur-md transition-colors duration-300 ${
+          onDark
+            ? "border-cream/15 bg-ink/75 text-cream shadow-[0_10px_30px_-12px_oklch(0_0_0/0.7)]"
+            : "border-border bg-background/85 shadow-lift"
+        }`}
+      >
+        <a
+          href="#top"
+          aria-label="Kaneeza Batool, back to top"
+          className="flex shrink-0 items-center gap-2 font-display text-base font-bold"
+        >
+          <img
+            src={avatar}
+            alt=""
+            width={32}
+            height={32}
+            className="h-8 w-8 rounded-full bg-ink object-cover"
+          />
+          <span className="hidden md:inline">Kaneeza Batool</span>
         </a>
-        <div className="flex items-center gap-1 font-mono text-xs sm:gap-2 sm:text-sm">
-          {[
-            ["Story", "#story"],
-            ["Journey", "#journey"],
-            ["Work", "#work"],
-          ].map(([l, h]) => (
+        <div className="flex items-center font-mono text-xs sm:gap-1 sm:text-sm">
+          {links.map(({ l, h, ext, wide }) => (
             <a
               key={l}
               href={h}
-              className="rounded-full px-2.5 py-1.5 hover:bg-soft hover:text-primary sm:px-3"
+              {...(ext ? { target: "_blank", rel: "noreferrer" } : {})}
+              className={`min-h-8 items-center gap-1 rounded-full px-2 transition-colors sm:px-3 ${wide ? "hidden sm:inline-flex" : "inline-flex"} ${
+                onDark
+                  ? "hover:bg-cream/10 hover:text-g2"
+                  : "hover:bg-soft hover:text-primary-hover"
+              }`}
             >
               {l}
+              {ext && <ArrowUpRight className="hidden h-3 w-3 sm:inline" aria-hidden />}
             </a>
           ))}
         </div>
         <a
           href="#contact"
-          className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-2 font-mono text-xs text-primary-foreground hover:bg-primary-hover sm:text-sm"
+          className="btn-3d btn-3d-sm inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-full bg-primary px-3 font-mono text-xs text-primary-foreground hover:bg-primary-hover sm:px-3.5 sm:text-sm"
         >
-          <Mail className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Say hi</span>
-          <span className="sm:hidden">Hi</span>
+          <Mail className="h-3.5 w-3.5" aria-hidden /> <span>Say hi</span>
         </a>
       </div>
     </nav>
@@ -710,18 +646,33 @@ function Nav() {
 }
 
 /* ---------- Hero ---------- */
-const heroStats = [
-  { id: "repos", to: REPOS_FALLBACK, label: "GitHub repositories", Icon: Github },
-  { to: 50, prefix: "Top ", label: "of 500 teams, DoraHacks", Icon: Trophy },
-  { to: 32, prefix: "#", label: "on Product Hunt, launch day", Icon: Rocket },
-  { to: 800, prefix: "$", label: "in hackathon rewards", Icon: Sparkles },
-  { to: 30, suffix: "+", label: "countries in my fellowship", Icon: Globe },
-  { to: certificates.length, label: "certificates and courses", Icon: Award },
-];
+/** The empty graph, drawn as one SVG pattern instead of hundreds of elements. */
+function EmptyGraph({ cols, className = "" }: { cols: number; className?: string }) {
+  const id = `empty-cell-${cols}`;
+  return (
+    <svg viewBox={`0 0 ${cols * 10} 70`} className={`w-full ${className}`} aria-hidden>
+      <defs>
+        <pattern id={id} width="10" height="10" patternUnits="userSpaceOnUse">
+          <rect x="0.8" y="0.8" width="8.4" height="8.4" rx="1.6" fill="var(--g0)" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill={`url(#${id})`} />
+      <rect
+        x="0.8"
+        y="0.8"
+        width="8.4"
+        height="8.4"
+        rx="1.6"
+        fill="var(--primary)"
+        className="twinkle"
+      />
+    </svg>
+  );
+}
 
 function Hero({ temp }: { temp: number | null }) {
   const [n, setN] = useState(0);
-  const done = n >= TYPED.length;
+  const depth = useDepth<HTMLDivElement>();
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setN(TYPED.length);
@@ -735,21 +686,29 @@ function Hero({ temp }: { temp: number | null }) {
     }, 45);
     return () => window.clearInterval(t);
   }, []);
-  const appear = `transition-all duration-700 motion-reduce:transition-none ${done ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`;
+  // Pure CSS entrance (see .rise in styles.css): starts on first paint, no JavaScript needed.
+  const appear = "rise";
+  // Identity, not achievements: the numbers are saved for "One year later".
+  const stickers = [
+    { t: "Full-stack · MERN", Icon: Code2, cls: "-left-10 top-10 md:-left-16", tilt: -6 },
+    { t: "Applied AI", Icon: Brain, cls: "-right-6 top-32 md:-right-8", tilt: 5 },
+    { t: "CS · Sukkur IBA", Icon: GraduationCap, cls: "-right-4 bottom-16 md:-right-6", tilt: 3 },
+  ];
   return (
     <header id="top" className="mx-auto max-w-6xl px-5 pt-10 pb-16 md:pt-16">
-      <div className="grid items-center gap-12 lg:grid-cols-[1.15fr_auto_0.75fr] lg:gap-10">
-        {/* Left: words */}
-        <div className="order-2 lg:order-1">
+      <div className="grid items-center gap-12 lg:grid-cols-[1.15fr_auto_0.75fr] lg:gap-14">
+        {/* Headline first on every screen; the portrait follows on phones. */}
+        <div className="order-1">
           <p className="font-hand text-3xl text-primary">Kaneeza Batool</p>
-          <p className="mt-3 font-mono text-sm text-muted-foreground" aria-label={TYPED}>
+          <p className="mt-3 font-mono text-sm text-muted-foreground">
+            <span className="sr-only">{TYPED}</span>
             <span aria-hidden>{TYPED.slice(0, n)}</span>
             <span aria-hidden className="caret ml-0.5 text-primary">
               ▍
             </span>
           </p>
           <h1
-            className={`mt-4 font-display text-4xl leading-[1.05] font-bold sm:text-5xl xl:text-6xl ${appear}`}
+            className={`extrude mt-4 font-display text-4xl leading-[1.05] font-bold sm:text-5xl xl:text-6xl ${appear}`}
           >
             It was supposed to be one{" "}
             <span className="relative inline-block">
@@ -758,140 +717,174 @@ function Hero({ temp }: { temp: number | null }) {
             </span>{" "}
             assignment.
           </h1>
-          <p className={`mt-6 max-w-xl text-lg text-muted-foreground delay-150 ${appear}`}>
-            A year later, my teams have taken 1st in our batch, 1st in our fellowship cluster, and
-            Top 50 in the world at DoraHacks. This is how one assignment got out of hand.
+          <p className={`mt-6 max-w-xl text-lg text-muted-foreground ${appear} [--d:150ms]`}>
+            A year later, it had turned into hackathons, fellowships, open source and a campus
+            community. This is how one assignment got out of hand.
           </p>
-          <div className={`mt-8 flex flex-wrap gap-3 delay-300 ${appear}`}>
+          <div className={`mt-8 flex flex-wrap gap-3 ${appear} [--d:300ms]`}>
             <a
               href="#story"
-              className="rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-soft transition-colors hover:bg-primary-hover"
+              className="btn-3d rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
             >
               Read the story
             </a>
             <a
               href="#work"
-              className="rounded-full border border-primary px-6 py-3 text-sm font-medium text-primary transition-colors hover:bg-soft"
+              className="btn-3d btn-3d-light rounded-full border border-primary bg-background px-6 py-3 text-sm font-medium text-primary-hover hover:bg-soft"
             >
               Skip to the work
             </a>
           </div>
         </div>
 
-        {/* Center: arch avatar with stickers */}
-        <div className="relative order-1 mx-auto lg:order-2">
-          <div className="arch relative h-80 w-64 overflow-hidden bg-ink shadow-lift ring-4 ring-primary ring-offset-4 ring-offset-background md:h-[26rem] md:w-80">
+        <div ref={depth} className="scene-3d relative order-2 mx-auto">
+          {/* Two tilted orbits behind the portrait. */}
+          <div
+            className="orbit w-[118%] sm:w-[150%]"
+            style={{
+              transform:
+                "rotateX(calc(70deg + var(--py, 0) * 8deg)) rotateY(calc(-14deg + var(--px, 0) * 10deg))",
+            }}
+            aria-hidden
+          >
+            <div className="orbit-ring" />
+          </div>
+          <div
+            className="orbit hidden w-[122%] sm:block"
+            style={{
+              transform:
+                "rotateX(calc(64deg + var(--py, 0) * 8deg)) rotateY(calc(22deg + var(--px, 0) * 10deg))",
+            }}
+            aria-hidden
+          >
+            <div className="orbit-ring solid" />
+          </div>
+          {/* A coloured back plate gives the portrait a visible thickness. */}
+          <div
+            aria-hidden
+            style={{
+              transform:
+                "perspective(1000px) rotateY(calc(var(--px, 0) * 9deg)) rotateX(calc(var(--py, 0) * -9deg)) translate3d(14px, 14px, -40px)",
+            }}
+            className="arch absolute inset-0 bg-g2 transition-transform duration-300 ease-out"
+          />
+          <div
+            style={{
+              transform:
+                "perspective(1000px) rotateY(calc(var(--px, 0) * 9deg)) rotateX(calc(var(--py, 0) * -9deg))",
+            }}
+            className="arch relative h-72 w-56 transition-transform duration-300 ease-out overflow-hidden bg-ink shadow-lift ring-4 ring-primary ring-offset-4 ring-offset-background md:h-[26rem] md:w-80"
+          >
             <img
               src={avatar}
               alt="Illustrated avatar of Kaneeza in a hoodie and headphones"
-              className="h-full w-full scale-110 object-cover object-[50%_40%]"
+              width={320}
+              height={416}
+              fetchPriority="high"
+              style={{ translate: "calc(var(--px, 0) * -10px) calc(var(--py, 0) * -10px)" }}
+              className="h-full w-full scale-110 object-cover object-[50%_40%] transition-[translate] duration-300 ease-out"
             />
           </div>
-          {[
-            {
-              t: "1st in batch · SMIT",
-              Icon: Trophy,
-              cls: "-left-10 top-10 md:-left-16",
-              tilt: -6,
-            },
-            { t: "Top 50 · DoraHacks", Icon: Globe, cls: "-right-10 top-32 md:-right-16", tilt: 5 },
-            {
-              t: "AI Engineer · DataCamp",
-              Icon: Award,
-              cls: "-left-6 bottom-12 md:-left-14",
-              tilt: 3,
-            },
-          ].map(({ t, Icon, cls, tilt: tl }, i) => (
+          {stickers.map(({ t, Icon, cls, tilt: tl }, i) => (
             <span
               key={t}
               className={`floaty absolute z-10 inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium shadow-lift ${cls}`}
-              style={{ ["--tilt" as string]: `${tl}deg`, animationDelay: `${i * 700}ms` }}
+              style={{
+                ["--tilt" as string]: `${tl}deg`,
+                animationDelay: `${i * 700}ms`,
+                translate: `calc(var(--px, 0) * ${18 + i * 6}px) calc(var(--py, 0) * ${18 + i * 6}px) ${30 + i * 10}px`,
+              }}
             >
-              <Icon className="h-3.5 w-3.5 text-primary" /> {t}
+              <Icon className="h-3.5 w-3.5 text-primary" aria-hidden /> {t}
             </span>
           ))}
-          <div className="absolute -right-4 -bottom-6 hidden items-end gap-1 md:flex">
+          <div
+            className="absolute -right-4 -bottom-6 hidden items-end gap-1 transition-[translate] duration-300 ease-out md:flex"
+            style={{ translate: "calc(var(--px, 0) * 12px) calc(var(--py, 0) * 12px) 50px" }}
+            aria-hidden
+          >
             <HandArrow className="h-8 w-12 -scale-x-100 rotate-180" />
             <span className="font-hand text-xl leading-none text-primary">me + my headphones</span>
           </div>
         </div>
 
-        {/* Right: status cards */}
-        <div className={`order-3 grid gap-3 sm:grid-cols-3 lg:grid-cols-1 ${appear}`}>
-          <div className="rounded-2xl border border-border bg-card p-4 shadow-soft">
-            <div className="flex items-center gap-2 font-mono text-[11px] text-muted-foreground uppercase">
-              <span className="pulse-dot h-2 w-2 rounded-full bg-primary" /> Open to
-            </div>
-            <p className="mt-2 text-sm font-medium">
-              Remote internships, open source, collaboration
-            </p>
-          </div>
-          <div className="rounded-2xl border border-border bg-card p-4 shadow-soft">
-            <div className="flex items-center gap-2 font-mono text-[11px] text-muted-foreground uppercase">
-              <Users className="h-3.5 w-3.5 text-primary" /> Leading
-            </div>
-            <p className="mt-2 text-sm font-medium">
-              The first AWS Student Builder Group at Sukkur IBA
-            </p>
-          </div>
-          <div className="rounded-2xl bg-ink p-4 text-cream shadow-soft">
-            <div className="flex items-center gap-2 font-mono text-[11px] text-cream/60 uppercase">
-              <MapPin className="h-3.5 w-3.5 text-primary" /> Based in
-            </div>
-            <p className="mt-2 text-sm font-medium">Sukkur, Pakistan</p>
-            {temp !== null && (
-              <p className="mt-1 font-mono text-xs text-cream/70">
-                ☀ it's {temp}°C there right now.
+        {/* Phones: a swipeable row of status cards. sm: three across. lg: a column. */}
+        <div className={`order-3 min-w-0 ${appear} [--d:200ms]`}>
+          <SwipeRow
+            label="Status"
+            className="-mx-5 scroll-px-5 items-start gap-3 px-5 pt-4 pb-3 md:mx-0 md:items-stretch md:grid md:grid-cols-2 md:px-0 md:pt-0 md:pb-0 lg:grid-cols-1 *:w-[78%] *:shrink-0 *:snap-start md:*:w-auto"
+          >
+            <div data-tilt className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+              <div className="pop-1 flex items-center gap-2 font-mono text-[11px] text-muted-foreground uppercase">
+                <span className="pulse-dot h-2 w-2 rounded-full bg-primary" aria-hidden /> Open to
+              </div>
+              <p className="pop-2 mt-2 text-sm font-medium">
+                Remote internships, open source, collaboration
               </p>
-            )}
-          </div>
+            </div>
+            <div data-tilt className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+              <div className="pop-1 flex items-center gap-2 font-mono text-[11px] text-muted-foreground uppercase">
+                <Users className="h-3.5 w-3.5 text-primary" aria-hidden /> Leading
+              </div>
+              <p className="pop-2 mt-2 text-sm font-medium">
+                The first AWS Student Builder Group at Sukkur IBA
+              </p>
+            </div>
+            <div data-tilt className="rounded-2xl bg-ink p-4 text-cream shadow-soft">
+              <div className="pop-1 flex items-center gap-2 font-mono text-[11px] text-cream/70 uppercase">
+                <MapPin className="h-3.5 w-3.5 text-g2" aria-hidden /> Based in
+              </div>
+              <p className="pop-2 mt-2 text-sm font-medium">Sukkur, Pakistan</p>
+              {temp !== null && (
+                <p className="pop-2 mt-1 font-mono text-xs text-cream/75">
+                  ☀ it's {temp}°C there right now.
+                </p>
+              )}
+            </div>
+            <CurrentlyCard />
+          </SwipeRow>
         </div>
       </div>
 
-      {/* The hook, as a picture: an empty GitHub graph */}
-      <div
-        className={`mt-16 rounded-3xl border border-border bg-card p-5 shadow-soft delay-500 md:p-7 ${appear}`}
-      >
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <Github className="h-5 w-5" />
-            <span className="font-mono text-sm">
-              <span className="hidden sm:inline">github.com/</span>
-              {GH}
-            </span>
-            <span className="rounded-full bg-soft px-2.5 py-0.5 font-mono text-[11px] whitespace-nowrap text-primary">
-              Nov 2025
+      {/* The entrance animation sits on a wrapper so it doesn't fight the card's tilt. */}
+      <div className={`mt-16 ${appear} [--d:450ms]`}>
+        <div
+          data-tilt="soft"
+          className="rounded-3xl border border-border bg-card p-5 shadow-soft md:p-7"
+        >
+          <div className="pop-1 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <Github className="h-5 w-5" aria-hidden />
+              <span className="font-mono text-sm">
+                <span className="hidden sm:inline">github.com/</span>
+                {GH}
+              </span>
+              <span className="rounded-full bg-soft px-2.5 py-0.5 font-mono text-[11px] whitespace-nowrap text-primary-hover">
+                Nov 2025
+              </span>
+            </div>
+            <span className="font-hand text-2xl leading-none text-primary">
+              day one. nothing here yet.
             </span>
           </div>
-          <span className="font-hand text-2xl leading-none text-primary">
-            day one. nothing here yet.
-          </span>
-        </div>
-        <div
-          className="mt-5 grid w-full grid-flow-col grid-cols-[repeat(18,minmax(0,1fr))] grid-rows-7 gap-[3px] sm:grid-cols-[repeat(53,minmax(0,1fr))]"
-          aria-hidden
-        >
-          {Array.from({ length: 371 }, (_, i) => (
-            <div
-              key={i}
-              className={`aspect-square rounded-[2px] ${i === 0 ? "pulse-dot bg-primary" : "bg-g0"} ${i >= 126 ? "hidden sm:block" : ""}`}
-            />
-          ))}
-        </div>
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-muted-foreground">
-          <span>
-            <span className="font-medium text-primary">0 repositories</span> · 0 contributions
-          </span>
-          <a href="#story" className="hover:text-primary">
-            scroll to watch it fill ↓
-          </a>
+          <EmptyGraph cols={18} className="mt-5 sm:hidden" />
+          <EmptyGraph cols={53} className="mt-5 hidden sm:block" />
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-muted-foreground">
+            <span>
+              <span className="font-medium text-primary-hover">0 repositories</span> · 0
+              contributions
+            </span>
+            <a href="#story" className="inline-flex min-h-8 items-center hover:text-primary-hover">
+              scroll to watch it fill ↓
+            </a>
+          </div>
         </div>
       </div>
     </header>
   );
 }
 
-/* ---------- What I do (bento) ---------- */
+/* ---------- What I do ---------- */
 function Bento() {
   const cards = [
     {
@@ -900,7 +893,7 @@ function Bento() {
       line: "MERN apps, from multi-portal systems to redesigns of live sites.",
       Icon: Code2,
       visual: (
-        <BrowserFrame url="localhost:5173" className="rotate-[-2deg]">
+        <BrowserFrame url="localhost:5173" className="-rotate-2">
           <div className="grid grid-cols-[2.5rem_1fr] gap-2 p-2.5">
             <div className="space-y-1">
               {[0, 1, 2, 3].map((i) => (
@@ -924,7 +917,7 @@ function Bento() {
       line: "Multi-agent systems, retrieval over real documents, voice interfaces.",
       Icon: Brain,
       visual: (
-        <div className="h-36 w-full">
+        <div className="h-36 w-full" aria-hidden>
           <AgentGraph />
         </div>
       ),
@@ -933,27 +926,27 @@ function Bento() {
     {
       k: "I bring people along",
       title: "Community",
-      line: "Founding the first AWS Student Builder Group at Sukkur IBA.",
+      line: "A campus builder group, global fellowships and an alumni Discord I started.",
       Icon: Users,
       visual: (
-        <div className="flex h-36 items-center justify-center">
+        <div className="flex h-36 items-center justify-center" aria-hidden>
           <div className="flex -space-x-3">
-            {["K", "", "", "", "", "+"].map((c, i) => (
+            {["", "", "", "", "", "+"].map((c, i) => (
               <span
                 key={i}
                 className={`flex h-12 w-12 items-center justify-center rounded-full border-2 border-card font-display text-sm font-bold ${
-                  [
-                    "bg-primary text-primary-foreground",
-                    "bg-g1",
-                    "bg-g2",
-                    "bg-g3",
-                    "bg-g4",
-                    "bg-ink text-cream",
-                  ][i]
+                  ["bg-primary", "bg-g1", "bg-g2", "bg-g3", "bg-g4", "bg-ink text-cream"][i]
                 }`}
               >
                 {i === 0 ? (
-                  <img src={avatar} alt="" className="h-full w-full rounded-full object-cover" />
+                  <img
+                    src={avatar}
+                    alt=""
+                    width={48}
+                    height={48}
+                    loading="lazy"
+                    className="h-full w-full rounded-full object-cover"
+                  />
                 ) : (
                   c
                 )}
@@ -965,61 +958,46 @@ function Bento() {
       tags: ["AWS", "GWY Fellowship", "Dev Weekends"],
     },
     {
-      k: "I learn in public",
-      title: "Every day",
-      line: "Daily build recaps as @kaneeza.builds, DSA in Java every day.",
+      k: "I show up daily",
+      title: "Consistency",
+      line: "DSA in Java every day, ML notebooks as I learn, all on GitHub.",
       Icon: Sparkles,
-      visual: (
-        <div className="relative flex h-36 w-full items-center justify-center">
-          {[-10, -3, 5].map((r, i) => (
-            <div
-              key={r}
-              className="absolute w-20 overflow-hidden rounded-xl border border-border bg-background shadow-lift"
-              style={{ transform: `translateX(${(i - 1) * 46}px) rotate(${r}deg)`, zIndex: i }}
-            >
-              <div className="flex items-center gap-1 border-b border-border px-1.5 py-1">
-                <img src={avatar} alt="" className="h-3.5 w-3.5 rounded-full bg-ink object-cover" />
-                <span className="truncate font-mono text-[6px]">kaneeza.builds</span>
-              </div>
-              <div
-                className={`flex aspect-[4/5] flex-col justify-end gap-1 p-1.5 ${i === 2 ? "bg-primary" : "bg-soft"}`}
-              >
-                <span
-                  className={`font-hand text-sm leading-none ${i === 2 ? "text-primary-foreground" : "text-primary"}`}
-                >
-                  build recap
-                </span>
-                <span
-                  className={`h-1 w-4/5 rounded-full ${i === 2 ? "bg-primary-foreground/60" : "bg-g2"}`}
-                />
-                <span
-                  className={`h-1 w-1/2 rounded-full ${i === 2 ? "bg-primary-foreground/60" : "bg-g2"}`}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      ),
-      tags: ["GitHub", "Instagram", "LeetCode"],
+      visual: <DailyVisual />,
+      tags: ["GitHub", "LeetCode", "Java"],
     },
   ];
   return (
-    <section className="mx-auto max-w-6xl px-5 py-16">
-      <SectionHead eyebrow="What I do" title="Four things I keep" accent="doing." />
-      <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <section className="mx-auto max-w-6xl px-5 pt-10 pb-6 md:py-16">
+      <div className="flex items-end justify-between gap-4">
+        <SectionHead eyebrow="What I do" title="Four things I keep" accent="doing." />
+        <span
+          className="shrink-0 pb-2 font-mono text-xs text-muted-foreground md:hidden"
+          aria-hidden
+        >
+          swipe →
+        </span>
+      </div>
+      {/* Phones: one swipeable row (the next card peeks in). md and up: the usual grid. */}
+      <SwipeRow
+        label="What I do, four cards"
+        className="-mx-5 mt-10 scroll-px-5 gap-4 px-5 pb-2 md:mx-0 md:grid md:grid-cols-2 md:px-0 md:pb-0 lg:grid-cols-4"
+      >
         {cards.map(({ k, title, line, Icon, visual, tags }) => (
-          <FadeIn key={k}>
-            <article className="group flex h-full flex-col rounded-3xl border border-border bg-card p-5 shadow-soft transition-transform hover:-translate-y-1">
-              <div className="flex items-center justify-between">
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                  <Icon className="h-4.5 w-4.5" />
+          <FadeIn key={k} className="w-[82%] shrink-0 snap-start md:w-auto">
+            <article
+              data-tilt
+              className="flex h-full flex-col rounded-3xl border border-border bg-card p-5 shadow-soft transition-transform hover:-translate-y-1"
+            >
+              <div className="pop-2 flex items-center justify-between">
+                <span className="btn-3d flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+                  <Icon className="h-4.5 w-4.5" aria-hidden />
                 </span>
                 <span className="font-mono text-[11px] text-muted-foreground">{title}</span>
               </div>
-              <h3 className="mt-4 font-display text-xl leading-tight font-bold">{k}</h3>
-              <div className="my-5 flex flex-1 items-center">{visual}</div>
+              <h3 className="pop-1 mt-4 font-display text-xl leading-tight font-bold">{k}</h3>
+              <div className="pop-3 my-5 flex flex-1 items-center">{visual}</div>
               <p className="text-sm text-muted-foreground">{line}</p>
-              <div className="mt-3 flex flex-wrap gap-1.5">
+              <div className="pop-1 mt-3 flex flex-wrap gap-1.5">
                 {tags.map((t) => (
                   <Tag key={t}>{t}</Tag>
                 ))}
@@ -1027,77 +1005,99 @@ function Bento() {
             </article>
           </FadeIn>
         ))}
-      </div>
-    </section>
-  );
-}
-
-/* ---------- Payoff: one year later ---------- */
-function Payoff({
-  days,
-  total,
-  repos,
-}: {
-  days: Day[] | null;
-  total: number | null;
-  repos: number;
-}) {
-  const [ref, inView] = useInView<HTMLDivElement>(0.35);
-  return (
-    <section className="grain-ink text-cream">
-      <div className="mx-auto max-w-6xl px-5 py-24">
-        <Label className="text-cream/60">The payoff</Label>
-        <p className="mt-6 font-mono text-sm text-cream/50 line-through decoration-primary decoration-2">
-          {TYPED}
-        </p>
-        <h2 className="mt-2 font-display text-5xl leading-[1.02] font-bold md:text-7xl">
-          One year <span className="font-hand text-6xl text-primary md:text-8xl">later.</span>
-        </h2>
-        <div ref={ref} className="mt-10 rounded-3xl bg-cream p-5 text-ink shadow-lift md:p-7">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <span className="flex items-center gap-3">
-              <Github className="h-5 w-5" />
-              <span className="font-mono text-sm">github.com/{GH}</span>
-            </span>
-            <span className="font-hand text-2xl leading-none text-primary">
-              same graph. not empty anymore.
-            </span>
-          </div>
-          <Graph days={days} total={total} repos={repos} reveal={inView ? 1 : 0} />
-        </div>
-        <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-cream/15 bg-cream/15 sm:grid-cols-3 lg:grid-cols-6">
-          {heroStats.map(({ id, to, prefix, suffix, label, Icon }) => (
-            <div key={label} className="flex flex-col gap-2 bg-ink p-5">
-              <Icon className="h-5 w-5 text-primary" />
-              <p className="font-display text-3xl font-bold">
-                <CountUp
-                  to={id === "repos" ? repos : to}
-                  prefix={prefix ?? ""}
-                  suffix={suffix ?? ""}
-                />
-              </p>
-              <p className="text-xs leading-snug text-cream/60">{label}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+      </SwipeRow>
     </section>
   );
 }
 
 /* ---------- GitHub graph ---------- */
-function Graph({
-  days,
-  total,
-  repos,
-  reveal,
-}: {
-  days: Day[] | null;
-  total: number | null;
-  repos: number;
-  reveal: number;
-}) {
-  const list =
+/**
+ * Draws the year of contributions on one <canvas> instead of 365 DOM cells, and animates
+ * the fill from the previously drawn day to the new cut-off.
+ */
+function GraphCanvas({ list, cut, weeks }: { list: Day[]; cut: number; weeks: number }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const drawn = useRef(0);
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    const c = ref.current;
+    if (!c) return;
+    if (typeof ResizeObserver === "undefined") {
+      const measure = () => setWidth(c.clientWidth);
+      measure();
+      window.addEventListener("resize", measure);
+      return () => window.removeEventListener("resize", measure);
+    }
+    // Size arrives after the browser's own layout: no forced layout at startup.
+    const ro = new ResizeObserver(([e]) => setWidth(e?.contentRect.width ?? 0));
+    ro.observe(c);
+    return () => ro.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const c = ref.current;
+    const ctx = c?.getContext("2d");
+    if (!c || !ctx || !width) return;
+    const css = getComputedStyle(document.documentElement);
+    const colors = GRAPH_HEX.map((hex, l) => {
+      const v = css.getPropertyValue(`--g${l}`).trim();
+      if (!v) return hex;
+      ctx.fillStyle = hex;
+      ctx.fillStyle = v; // ignored if the browser can't parse it
+      return ctx.fillStyle === hex.toLowerCase() ? hex : v;
+    });
+    const dpr = window.devicePixelRatio || 1;
+    const step = width / weeks;
+    const size = step * 0.82;
+    const r = Math.max(1, size * 0.18);
+    c.width = Math.round(width * dpr);
+    c.height = Math.round(step * 7 * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const paint = (upTo: number) => {
+      ctx.clearRect(0, 0, width, step * 7);
+      list.forEach((d, i) => {
+        ctx.fillStyle = colors[i < upTo ? d.level : 0] ?? colors[0]!;
+        ctx.beginPath();
+        ctx.roundRect(Math.floor(i / 7) * step, (i % 7) * step, size, size, r);
+        ctx.fill();
+      });
+    };
+
+    const from = Math.min(drawn.current, list.length);
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce || from === cut) {
+      drawn.current = cut;
+      paint(cut);
+      return;
+    }
+    const start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - start) / 700);
+      const at = Math.round(from + (cut - from) * (1 - Math.pow(1 - p, 3)));
+      drawn.current = at;
+      paint(at);
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [list, cut, weeks, width]);
+
+  return (
+    <canvas
+      ref={ref}
+      aria-hidden
+      className="block w-full"
+      style={{ aspectRatio: `${weeks} / 7` }}
+    />
+  );
+}
+
+function Graph({ gh, reveal }: { gh: GitHubData; reveal: number }) {
+  const { days, total, repos, snapshot } = gh;
+  const list: Day[] =
     days && days.length
       ? days
       : Array.from({ length: 365 }, () => ({ date: "", count: 0, level: 0 }));
@@ -1106,35 +1106,28 @@ function Graph({
   const shown = list.slice(0, cut).reduce((a, d) => a + d.count, 0);
   return (
     <div className="w-full">
-      <div
-        className="grid w-full grid-flow-col grid-rows-7 gap-[2px]"
-        style={{ gridTemplateColumns: `repeat(${weeks}, minmax(0, 1fr))` }}
-      >
-        {list.map((d, i) => (
-          <div
-            key={d.date || i}
-            title={d.date && i < cut ? `${d.count} on ${d.date}` : undefined}
-            className={`aspect-square w-full rounded-[1px] transition-colors duration-300 ${i < cut ? LV[d.level] : LV[0]}`}
-            style={{ transitionDelay: `${(i % 60) * 8}ms` }}
-          />
-        ))}
-      </div>
+      <GraphCanvas list={list} cut={cut} weeks={weeks} />
+
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-muted-foreground">
-        <span>
-          <span className="font-medium text-primary">
-            {Math.round(repos * reveal)} repositories
+        <span aria-live="polite">
+          <span className="font-medium text-primary-hover">
+            {/* Phrased as progress so it doesn't read as a different total from the payoff. */}
+            {reveal > 0 && reveal < 1
+              ? `${Math.round(repos * reveal)} of ${repos} repositories`
+              : `${Math.round(repos * reveal)} repositories`}
           </span>
           {" · "}
           {days ? `${shown} of ${total ?? 0} contributions` : "Loading GitHub…"}
+          {snapshot && reveal > 0 && <span> (saved {snapshot})</span>}
         </span>
         {reveal === 0 ? (
           <span>scroll to watch it fill ↓</span>
         ) : (
           <a
-            href={`https://github.com/${GH}`}
+            href={LINKS.github}
             target="_blank"
             rel="noreferrer"
-            className="hover:text-primary"
+            className="inline-flex min-h-8 items-center hover:text-primary-hover"
           >
             @{GH}
           </a>
@@ -1145,24 +1138,83 @@ function Graph({
 }
 
 /* ---------- Project card ---------- */
-function ProjectCard({
-  p,
-  big = false,
-  dark = false,
-}: {
-  p: Project;
-  big?: boolean;
-  dark?: boolean;
-}) {
+const SCREENS: Record<string, () => ReactNode> = {
+  auraCheck: () => <AuraScreen />,
+  TITAN: () => <TitanScreen />,
+  PakLawAI: () => <PakLawScreen />,
+  ElderBridge: () => <ElderScreen />,
+  "JobSkillShare redesign": () => <JssScreen />,
+  "Dexo.pk": () => <DexoScreen />,
+};
+
+const projectId = (p: Project) =>
+  `project-${p.title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")}`;
+
+/**
+ * Compact version used inside the story: thumbnail, title, role and award, plus a link
+ * to the full card in "All work" (which keeps the long description and big mockup).
+ */
+function StoryProjectRow({ p }: { p: Project }) {
+  return (
+    // Phones: small thumbnail beside the title, details at full width below.
+    // sm and up: thumbnail on the left spanning both rows.
+    <article
+      data-tilt
+      className="grid grid-cols-[5.5rem_1fr] items-center gap-x-3 gap-y-1 rounded-2xl border border-border bg-card p-3 shadow-soft sm:grid-cols-[10rem_1fr] sm:items-start sm:gap-x-4"
+    >
+      <div className="pop-3 relative h-14 overflow-hidden rounded-xl bg-soft shadow-soft sm:row-span-2 sm:h-28">
+        <div className="pointer-events-none absolute top-1/2 left-1/2 w-100 -translate-x-1/2 -translate-y-1/2 scale-[0.22] sm:scale-[0.4]">
+          {SCREENS[p.title]?.()}
+        </div>
+      </div>
+      <div className="pop-1 flex min-w-0 items-start justify-between gap-2">
+        <h4 className="font-display text-lg leading-tight font-bold sm:text-xl">{p.title}</h4>
+        <span
+          className={`shrink-0 rounded-full px-2 py-0.5 font-mono text-[10px] uppercase ${p.kind === "ai" ? "bg-primary-hover text-primary-foreground" : "bg-background"}`}
+        >
+          {p.kind === "ai" ? "AI" : "Web"}
+        </span>
+      </div>
+      <div className="col-span-2 min-w-0 sm:col-span-1 sm:col-start-2">
+        {p.role && (
+          <p className="mt-1.5 text-sm leading-snug">
+            <span className="font-mono text-[11px] text-primary-hover uppercase">My role · </span>
+            {p.role}
+          </p>
+        )}
+        {p.result && (
+          <p className="mt-2 flex gap-1.5 text-sm leading-snug font-medium text-primary-hover">
+            <Trophy className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+            {p.result}
+          </p>
+        )}
+        <a
+          href={`#${projectId(p)}`}
+          className="mt-1 inline-flex min-h-8 items-center gap-1 font-mono text-xs text-muted-foreground hover:text-primary-hover"
+        >
+          see full card <span aria-hidden>↓</span>
+          <span className="sr-only"> for {p.title}</span>
+        </a>
+      </div>
+    </article>
+  );
+}
+
+function ProjectCard({ p, big = false }: { p: Project; big?: boolean }) {
   return (
     <article
-      className={`group h-full overflow-hidden rounded-3xl border shadow-soft ${dark ? "border-cream/15 bg-cream/5 text-cream" : "border-border bg-card"} ${big ? "lg:grid lg:grid-cols-[1.25fr_1fr]" : "flex flex-col"}`}
+      id={projectId(p)}
+      data-tilt
+      className={`project-card group h-full scroll-mt-24 overflow-hidden rounded-3xl border border-border bg-card shadow-soft ${big ? "lg:grid lg:grid-cols-[1.25fr_1fr]" : "flex flex-col"}`}
     >
       <div
-        className={`relative flex items-center justify-center overflow-hidden p-5 md:p-7 ${dark ? "bg-cream/5" : "bg-soft"} ${big ? "lg:order-2" : ""}`}
+        className={`relative flex items-center justify-center overflow-hidden bg-soft p-5 md:p-7 ${big ? "lg:order-2" : ""}`}
       >
-        <div className="w-full transition-transform duration-500 group-hover:scale-[1.03] group-hover:-rotate-1">
-          <Screen p={p} />
+        <div className="w-full drop-shadow-[0_18px_22px_oklch(0.2_0.04_285/0.18)] transition-transform duration-500 ease-out group-hover:scale-[1.04] group-hover:transform-[perspective(900px)_rotateY(-9deg)_rotateX(6deg)]">
+          {SCREENS[p.title]?.()}
         </div>
       </div>
       <div className={`flex flex-1 flex-col ${big ? "p-6 md:p-8" : "p-5"}`}>
@@ -1171,58 +1223,46 @@ function ProjectCard({
             {p.title}
           </h3>
           <span
-            className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase ${p.kind === "ai" ? "bg-primary text-primary-foreground" : dark ? "bg-cream/10" : "bg-background"}`}
+            className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase ${p.kind === "ai" ? "bg-primary-hover text-primary-foreground" : "bg-background"}`}
           >
             {p.kind === "ai" ? "AI" : "Web"}
           </span>
         </div>
-        {p.what && (
-          <p
-            className={`mt-3 text-sm ${dark ? "text-cream/75" : "text-muted-foreground"} ${big ? "" : "line-clamp-4"}`}
-          >
-            {p.what}
-          </p>
-        )}
+        {p.what && <p className="mt-3 text-sm text-muted-foreground">{p.what}</p>}
         {p.role && (
           <p className="mt-3 text-sm">
-            <span className="font-mono text-[11px] text-primary uppercase">My role · </span>
+            <span className="font-mono text-[11px] text-primary-hover uppercase">My role · </span>
             {p.role}
           </p>
         )}
-        {big && p.context && (
-          <p className={`mt-3 text-sm ${dark ? "text-cream/75" : "text-muted-foreground"}`}>
-            {p.context}
-          </p>
-        )}
+        {big && p.context && <p className="mt-3 text-sm text-muted-foreground">{p.context}</p>}
         {p.result && (
-          <p
-            className={`mt-4 flex gap-2 rounded-2xl px-3 py-2.5 text-sm font-medium ${dark ? "bg-primary/20 text-cream" : "bg-background text-primary"}`}
-          >
-            <Trophy className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+          <p className="mt-4 flex gap-2 rounded-2xl bg-background px-3 py-2.5 text-sm font-medium text-primary-hover">
+            <Trophy className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
             {p.result}
           </p>
         )}
         <div className="mt-auto pt-4">
           {p.team && (
-            <p
-              className={`mb-3 flex items-center gap-1.5 font-mono text-[11px] ${dark ? "text-cream/60" : "text-muted-foreground"}`}
-            >
-              <Users className="h-3.5 w-3.5" /> {p.team}
+            <p className="mb-3 flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">
+              <Users className="h-3.5 w-3.5" aria-hidden /> {p.team}
             </p>
           )}
           {p.tags.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {p.tags.map((t) => (
-                <Tag key={t} dark={dark}>
-                  {t}
-                </Tag>
+                <Tag key={t}>{t}</Tag>
               ))}
             </div>
           )}
           {(p.live || p.github) && (
-            <div className="mt-4 flex flex-wrap gap-4">
-              <ExtLink href={p.live}>Live</ExtLink>
-              <ExtLink href={p.github}>Code</ExtLink>
+            <div className="mt-3 flex flex-wrap gap-5">
+              <ExtLink href={p.live} label={`${p.title} live site`}>
+                Live
+              </ExtLink>
+              <ExtLink href={p.github} label={`${p.title} source code`}>
+                Code
+              </ExtLink>
             </div>
           )}
         </div>
@@ -1231,63 +1271,12 @@ function ProjectCard({
   );
 }
 
-/* ---------- Chapter-specific visuals ---------- */
-function FellowshipCard() {
-  const stats = [
-    { n: "30+", l: "countries", Icon: Globe },
-    { n: "Top 100", l: "most active fellows", Icon: Trophy },
-    { n: "daily", l: "build recaps, @kaneeza.builds", Icon: Sparkles },
-  ];
-  return (
-    <div className="grain-ink mt-6 overflow-hidden rounded-3xl text-cream shadow-lift">
-      <div className="grid items-center gap-6 p-6 md:p-8 lg:grid-cols-[1fr_1.15fr]">
-        <div>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 font-mono text-[11px] text-primary-foreground uppercase">
-            <Users className="h-3.5 w-3.5" /> Fellowship
-          </span>
-          <h3 className="mt-4 font-display text-2xl leading-tight font-bold md:text-3xl">
-            GWY Fellowship 2.0 <span className="text-cream/60">(DoraDAO)</span>
-          </h3>
-          <p className="mt-2 text-cream/75">
-            A global fellowship for{" "}
-            <span className="font-hand text-2xl text-primary">women in AI</span>. It's also where
-            auraCheck was born, at DoraHacks 2.0.
-          </p>
-        </div>
-        <div className="relative rounded-2xl bg-cream p-3">
-          <WorldMap className="w-full" />
-          <span className="absolute right-3 bottom-3 rounded-full bg-ink px-2.5 py-1 font-mono text-[10px] text-cream">
-            30+ countries, one cohort
-          </span>
-        </div>
-      </div>
-      <div className="grid border-t border-cream/10 sm:grid-cols-3">
-        {stats.map(({ n, l, Icon }) => (
-          <div
-            key={l}
-            className="flex items-center gap-3 border-cream/10 p-5 not-last:border-b sm:not-last:border-r sm:not-last:border-b-0"
-          >
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/20 text-primary">
-              <Icon className="h-5 w-5" />
-            </span>
-            <span>
-              <span className="block font-display text-2xl leading-none font-bold text-primary">
-                {n}
-              </span>
-              <span className="mt-1 block text-xs text-cream/60">{l}</span>
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
+/* ---------- Chapter 4 pieces ---------- */
 function Stamp() {
   const text = "AWS STUDENT BUILDER GROUP · SUKKUR IBA · EST. SEP 2026 · ";
   return (
-    <div className="relative mx-auto h-48 w-48 md:h-56 md:w-56">
-      <svg viewBox="0 0 200 200" className="spin-slow absolute inset-0 h-full w-full" aria-hidden>
+    <div className="relative mx-auto h-48 w-48 md:h-56 md:w-56" aria-hidden>
+      <svg viewBox="0 0 200 200" className="spin-slow absolute inset-0 h-full w-full">
         <defs>
           <path id="stamp-circle" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" />
         </defs>
@@ -1305,12 +1294,42 @@ function Stamp() {
   );
 }
 
+function CommunityRow() {
+  const icons = { discord: MessagesSquare, ambassador: Megaphone };
+  return (
+    <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+      {communityRoles.map((r) => {
+        const Icon = icons[r.icon];
+        return (
+          <li
+            key={r.text}
+            data-tilt
+            className="flex items-center gap-3 rounded-2xl border border-border bg-background p-4 shadow-soft"
+          >
+            <span className="pop-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-soft text-primary-hover shadow-soft">
+              <Icon className="h-5 w-5" aria-hidden />
+            </span>
+            <span className="pop-1">
+              <span className="block font-medium leading-snug">{r.text}</span>
+              <span className="block text-sm text-muted-foreground">{r.note}</span>
+            </span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 /* ---------- Page ---------- */
 function Index() {
-  const { days, total, repos } = useContributions();
+  const gh = useGitHub();
   const temp = useSukkurTemp();
+  const desktop = useMedia("(min-width: 768px)");
   const [active, setActive] = useState(-1);
   const refs = useRef<(HTMLElement | null)[]>([]);
+  const root = useRef<HTMLDivElement>(null);
+  usePauseOffscreen(root);
+  useTiltCards(root);
 
   useEffect(() => {
     const io = new IntersectionObserver(
@@ -1323,359 +1342,231 @@ function Index() {
     refs.current.forEach((r) => r && io.observe(r));
     return () => io.disconnect();
   }, []);
-  const reveal = active < 0 ? 0 : (active + 1) / (chapters.length + 1);
+  // The graph is full by the end of chapter 4.
+  const reveal = active < 0 ? 0 : (active + 1) / chapters.length;
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-background text-foreground">
-      <Nav />
-      <Hero temp={temp} />
-      <Bento />
-
-      {/* Story */}
-      <section id="story" className="mx-auto max-w-6xl scroll-mt-20 px-5 pt-10">
-        <SectionHead
-          eyebrow="The story"
-          title="How one assignment got"
-          accent="out of hand."
-          sub="Four chapters, one GitHub graph. Watch it fill as you scroll."
-        />
-        <div className="sticky top-[68px] z-20 -mx-5 mt-8 border-b border-border bg-background/95 px-5 py-3 backdrop-blur md:hidden">
-          <Graph days={days} total={total} repos={repos} reveal={reveal} />
-        </div>
-        <div className="md:grid md:grid-cols-[0.85fr_1.5fr] md:gap-12">
-          <aside className="hidden md:block">
-            <div className="sticky top-28 mt-16 rounded-3xl border border-border bg-card p-5 shadow-soft">
-              <Label>GitHub, chapter by chapter</Label>
-              <div className="mt-4">
-                <Graph days={days} total={total} repos={repos} reveal={reveal} />
-              </div>
-              <ol className="mt-5 space-y-1.5 border-t border-border pt-4">
-                {chapters.map((c, i) => (
-                  <li
-                    key={c.title}
-                    className={`flex items-center gap-2 font-mono text-xs transition-colors ${active >= i ? "text-foreground" : "text-muted-foreground/60"}`}
-                  >
-                    <span
-                      className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${active === i ? "bg-primary text-primary-foreground" : active > i ? "bg-g2" : "bg-g0"}`}
-                    >
-                      {i + 1}
-                    </span>
-                    {c.title}
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </aside>
-          <div className="min-w-0">
-            {chapters.map((c, i) => (
-              <article
-                key={c.title}
-                data-idx={i}
-                ref={(el) => {
-                  refs.current[i] = el;
-                }}
-                className="relative py-16 md:min-h-[80vh] md:py-24"
-              >
-                <span
-                  aria-hidden
-                  className="text-outline pointer-events-none absolute top-6 right-0 font-display text-[7rem] leading-none font-bold select-none md:text-[11rem]"
-                >
-                  0{i + 1}
-                </span>
-                <Guide line={c.bubble} />
-                <FadeIn>
-                  <Commit msg={c.commit} />
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Label className="text-primary">{c.label}</Label>
-                    <span className="rounded-full bg-soft px-2.5 py-0.5 font-mono text-[11px] text-primary">
-                      {c.date}
-                    </span>
-                  </div>
-                  <h2 className="relative mt-3 font-display text-3xl leading-tight font-bold md:text-5xl">
-                    {c.title}
-                    {c.doodle && <Doodle kind={c.doodle} />}
-                  </h2>
-                  {c.lines && (
-                    <div className="mt-8 grid items-center gap-8 lg:grid-cols-[1fr_1.1fr]">
-                      <div className="space-y-2 text-xl text-muted-foreground">
-                        {c.lines.map((l) => (
-                          <p key={l}>{l}</p>
-                        ))}
-                      </div>
-                      <figure
-                        className="polaroid tiltable"
-                        style={{ ["--tilt" as string]: "2.5deg" }}
-                      >
-                        <span className="tape" aria-hidden />
-                        <FirstPortfolioScreen />
-                        <figcaption className="mt-2 text-center font-hand text-xl">
-                          my first portfolio. plain HTML.
-                        </figcaption>
-                      </figure>
-                    </div>
-                  )}
-                  {c.stat && (
-                    <div className="mt-10 grid items-center gap-8 rounded-3xl border border-border bg-card p-6 shadow-soft md:p-8 lg:grid-cols-[auto_1fr]">
-                      <Stamp />
-                      <div>
-                        <p className="font-display text-2xl leading-snug font-bold text-primary md:text-3xl">
-                          {c.stat}
-                        </p>
-                        <p className="mt-3 text-lg text-muted-foreground">{c.statText}</p>
-                      </div>
-                    </div>
-                  )}
-                  {c.fellowship && <FellowshipCard />}
-                </FadeIn>
-                {c.featured && (
-                  <FadeIn className="mt-8">
-                    <ProjectCard p={c.featured} />
-                  </FadeIn>
-                )}
-                {c.projects && (
-                  <div className="mt-6 grid gap-4 lg:grid-cols-2">
-                    {c.projects.map((p) => (
-                      <FadeIn key={p.title}>
-                        <ProjectCard p={p} />
-                      </FadeIn>
-                    ))}
-                  </div>
-                )}
-                {c.stickies && (
-                  <div className="mt-10 flex flex-wrap gap-6 px-2">
-                    {c.stickies.map((t, k) => (
-                      <Sticky key={t} text={t} i={k} />
-                    ))}
-                  </div>
-                )}
-                {c.note && (
-                  <p className="mt-6 flex items-start gap-2 font-mono text-sm text-muted-foreground">
-                    <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                    {c.note}
-                  </p>
-                )}
-                {c.badges && (
-                  <div className="mt-6 flex flex-wrap gap-2">
-                    {c.badges.map((b) => (
-                      <span
-                        key={b}
-                        className="inline-flex items-center gap-2 rounded-full border border-gold bg-background px-3 py-1.5 text-xs font-medium text-gold"
-                      >
-                        <Award className="h-3.5 w-3.5" /> {b}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <Journey />
-      <MapSection temp={temp} />
-
-      {/* Chapter 5 */}
-      <section
-        data-idx={chapters.length}
-        ref={(el) => {
-          refs.current[chapters.length] = el;
-        }}
-        className="grain-ink text-cream"
+    <div ref={root} className="min-h-screen overflow-x-clip bg-background text-foreground">
+      <a
+        href="#main"
+        className="sr-only z-50 rounded-full bg-ink px-4 py-2 text-sm text-cream focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
       >
-        <div className="mx-auto max-w-6xl px-5 py-24">
-          <Guide line="still here. still building." dark />
-          <Commit msg="feat: AI happened" dark />
-          <Label className="text-cream/70">Chapter 5 · Now</Label>
-          <h2 className="mt-3 font-display text-3xl font-bold md:text-5xl">
-            This chapter is still being written.<span className="caret ml-1 text-primary">|</span>
-          </h2>
-          <div className="mt-10 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-            <div className="overflow-hidden rounded-2xl border border-cream/15 bg-cream/5">
-              <div className="flex items-center gap-1.5 border-b border-cream/10 px-4 py-3">
-                <span className="h-2.5 w-2.5 rounded-full bg-primary" />
-                <span className="h-2.5 w-2.5 rounded-full bg-gold" />
-                <span className="h-2.5 w-2.5 rounded-full bg-cream/40" />
-                <span className="ml-3 font-mono text-xs text-cream/60">~/kaneeza/now</span>
-              </div>
-              <div className="space-y-3 p-5 font-mono text-sm md:p-6">
-                {terminal.map(([k, v]) => (
-                  <div key={k} className="grid gap-1 sm:grid-cols-[8rem_1fr] sm:gap-4">
-                    <span className="text-primary">{k}</span>
-                    <span>{v}</span>
-                  </div>
-                ))}
-                <p className="pt-2 text-cream/60">
-                  $ <span className="caret">▍</span>
-                </p>
-              </div>
+        Skip to content
+      </a>
+      <Nav />
+      <main id="main">
+        <Hero temp={temp} />
+        <Bento />
+
+        {/* Story */}
+        {/* Bottom padding: the sticky GitHub card stops short of the dark section below. */}
+        <section id="story" className="mx-auto max-w-6xl scroll-mt-20 px-5 pt-10 pb-12 md:pb-20">
+          <SectionHead
+            eyebrow="The story"
+            title="How one assignment got"
+            accent="out of hand."
+            sub="Four chapters, one GitHub graph. Watch it fill as you scroll."
+          />
+          {desktop === false && (
+            <div className="sticky top-[68px] z-20 -mx-5 mt-8 border-b border-border bg-background/95 px-5 py-3 backdrop-blur">
+              <Graph gh={gh} reveal={reveal} />
             </div>
-            <div className="flex flex-col gap-3">
-              <p className="font-medium">Follow the work as it happens</p>
-              {[
-                [
-                  "ai-ml-learning-journey",
-                  "Python and machine learning, one notebook at a time",
-                  Brain,
-                ],
-                ["dsa-in-java", "One data structures problem a day, in Java", Code2],
-              ].map(([repo, line, Icon]) => {
-                const I = Icon as typeof Brain;
-                return (
-                  <a
-                    key={repo as string}
-                    href={`https://github.com/${GH}/${repo as string}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="group flex items-center gap-4 rounded-2xl border border-cream/15 bg-cream/5 p-4 transition-colors hover:border-primary hover:bg-primary/10"
+          )}
+          <div className="md:grid md:grid-cols-[0.85fr_1.5fr] md:gap-12">
+            <aside className="hidden md:block">
+              <div className="sticky top-28 mt-16 rounded-3xl border border-border bg-card p-5 shadow-soft">
+                <Label>GitHub, chapter by chapter</Label>
+                <div className="mt-4">{desktop && <Graph gh={gh} reveal={reveal} />}</div>
+                <ol className="mt-5 space-y-1.5 border-t border-border pt-4">
+                  {chapters.map((c, i) => (
+                    <li
+                      key={c.title}
+                      className={`flex items-center gap-2 font-mono text-xs transition-colors ${active >= i ? "text-foreground" : "text-muted-foreground"}`}
+                    >
+                      <span
+                        className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${active === i ? "bg-primary-hover text-primary-foreground" : active > i ? "bg-g2" : "bg-g0"}`}
+                      >
+                        {i + 1}
+                      </span>
+                      {c.title}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </aside>
+            <div className="min-w-0">
+              {chapters.map((c, i) => (
+                <article
+                  key={c.title}
+                  data-idx={i}
+                  ref={(el) => {
+                    refs.current[i] = el;
+                  }}
+                  className="relative py-10 md:py-14"
+                >
+                  <span
+                    aria-hidden
+                    className="text-outline num-3d pointer-events-none absolute top-6 right-0 hidden font-display md:block text-[7rem] leading-none font-bold select-none md:text-[11rem]"
                   >
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                      <I className="h-5 w-5" />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate font-mono text-sm">{repo as string}</span>
-                      <span className="block text-xs text-cream/60">{line as string}</span>
-                    </span>
-                    <ArrowUpRight className="h-4 w-4 text-cream/50 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-primary" />
-                  </a>
-                );
-              })}
+                    0{i + 1}
+                  </span>
+                  <Guide line={c.bubble} />
+                  <FadeIn>
+                    <Commit msg={c.commit} />
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Label className="text-primary-hover">{c.label}</Label>
+                      <span className="rounded-full bg-soft px-2.5 py-0.5 font-mono text-[11px] text-primary-hover">
+                        {c.date}
+                      </span>
+                    </div>
+                    {/* h3: chapters sit under the Story section's h2. */}
+                    <h3 className="relative mt-3 font-display text-3xl leading-tight font-bold md:text-5xl">
+                      {c.title}
+                      <Doodle kind={c.doodle} />
+                    </h3>
+                    {c.lines && (
+                      <div className="mt-8 grid items-center gap-8 lg:grid-cols-[1fr_1.1fr]">
+                        <div className="space-y-2 text-xl text-muted-foreground">
+                          {c.lines.map((l) => (
+                            <p key={l}>{l}</p>
+                          ))}
+                        </div>
+                        <figure
+                          data-tilt
+                          className="polaroid tiltable"
+                          style={{ ["--tilt" as string]: "2.5deg" }}
+                        >
+                          <span className="tape" aria-hidden />
+                          <div className="pop-2">
+                            <FirstPortfolioScreen />
+                          </div>
+                          <figcaption className="pop-1 mt-2 text-center font-hand text-xl">
+                            my first portfolio. plain HTML.
+                          </figcaption>
+                        </figure>
+                      </div>
+                    )}
+                    {c.community && (
+                      <>
+                        {/* Phones: half-size stamp beside the headline, text below.
+                            lg: full stamp on the left spanning both rows. */}
+                        <div
+                          data-tilt="soft"
+                          className="mt-8 grid grid-cols-[6rem_1fr] items-center gap-x-4 gap-y-3 rounded-3xl border border-border bg-card p-5 shadow-soft md:mt-10 md:grid-cols-[7rem_1fr] md:p-8 lg:grid-cols-[auto_1fr] lg:gap-x-8"
+                        >
+                          <div className="pop-3 h-24 w-24 md:h-28 md:w-28 lg:row-span-2 lg:h-auto lg:w-auto">
+                            <div className="origin-top-left scale-50 lg:scale-100">
+                              <Stamp />
+                            </div>
+                          </div>
+                          <p className="font-display text-xl leading-snug font-bold text-primary-hover md:text-3xl lg:self-end">
+                            {aws.stat}
+                          </p>
+                          <p className="col-span-2 text-base text-muted-foreground md:text-lg lg:col-span-1 lg:col-start-2 lg:self-start">
+                            {aws.text}
+                          </p>
+                        </div>
+                        <CommunityRow />
+                      </>
+                    )}
+                  </FadeIn>
+                  {(c.featured || c.projects) && (
+                    <ul className="mt-8 space-y-3">
+                      {[...(c.featured ? [c.featured] : []), ...(c.projects ?? [])].map((p) => (
+                        <li key={p.title}>
+                          <FadeIn>
+                            <StoryProjectRow p={p} />
+                          </FadeIn>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {c.stickies && (
+                    <div className="mt-8 md:mt-10">
+                      <SwipeRow
+                        label="Sticky notes"
+                        className="-mx-5 scroll-px-5 gap-5 px-5 py-4 *:shrink-0 *:snap-start md:mx-0 md:flex-wrap md:gap-6 md:px-2 md:py-0"
+                      >
+                        {c.stickies.map((t, k) => (
+                          <Sticky key={t} text={t} i={k} />
+                        ))}
+                      </SwipeRow>
+                    </div>
+                  )}
+                  {c.note && (
+                    <p className="mt-6 flex items-start gap-2 font-mono text-sm text-muted-foreground">
+                      <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
+                      {c.note}
+                    </p>
+                  )}
+                  {c.badges && (
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      {c.badges.map((b) => (
+                        <span
+                          key={b}
+                          className="inline-flex items-center gap-2 rounded-full border border-gold bg-background px-3 py-1.5 text-xs font-medium text-foreground"
+                        >
+                          <Award className="h-3.5 w-3.5 text-gold" aria-hidden /> {b}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </article>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <Work />
+        {/* About me: the person, not only the developer. */}
+        <AboutMe />
+        {/* Reach's map now lives in the Journey header; "Things I didn't finish" is a
+            question in the About chat; "Now" closes the payoff section. */}
+        <Journey temp={temp} />
+        <Work />
+        <Tools />
 
-      {/* Things I didn't finish */}
-      <section className="mx-auto max-w-6xl px-5 py-20">
-        <Guide line="the honest part." />
-        <Commit msg="wip: everything else" />
-        <Label>Chapter 6 · Things I didn't finish</Label>
-        <h2 className="mt-3 font-display text-3xl font-bold md:text-5xl">
-          The wins are real. So are these.
-        </h2>
-        <div className="cork relative mt-10 rounded-3xl border border-border p-8 shadow-soft md:p-12">
-          <span className="absolute -top-3 left-8 rounded-sm bg-ink px-3 py-1 font-mono text-[11px] text-cream">
-            status: wip
-          </span>
-          <div className="flex flex-wrap justify-center gap-8">
-            {unfinished.map((u, k) => (
-              <Sticky key={u} text={u} i={k} />
-            ))}
-          </div>
-        </div>
-      </section>
+        <Payoff gh={gh} />
 
-      {/* Tools + certificates */}
-      <section className="mx-auto max-w-6xl px-5 py-16">
-        <SectionHead eyebrow="Tools" title="What's on my" accent="keyboard." />
-        <div className="mt-10 grid gap-8 md:grid-cols-[10rem_1fr] md:items-start">
-          <p className="font-display text-lg font-bold">I build with</p>
-          <div className="flex flex-wrap gap-2.5">
-            {toolsBuild.map((t) => (
-              <span key={t} className="keycap">
-                {t}
-              </span>
-            ))}
-          </div>
-          <p className="font-display text-lg font-bold">I am learning</p>
-          <div className="flex flex-wrap gap-2.5">
-            {toolsLearn.map((t) => (
-              <span key={t} className="keycap keycap-ghost">
-                {t}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-16 flex items-end justify-between gap-4">
-          <div>
-            <Label>Certificates</Label>
-            <p className="mt-2 font-display text-2xl font-bold">
-              {certificates.length} certificates and courses
-            </p>
-          </div>
-          <span className="hidden font-mono text-xs text-muted-foreground sm:inline">scroll →</span>
-        </div>
-        <div className="scrollbar-none -mx-5 mt-6 flex snap-x gap-4 overflow-x-auto px-5 pb-4">
-          {certificates.map((c, i) => {
-            const m = /^(.*) \((.*)\)$/.exec(c);
-            const name = m?.[1] ?? c;
-            const issuer = m?.[2] ?? "DataCamp";
-            return (
-              <article
-                key={c}
-                className="paper relative w-64 shrink-0 snap-start rounded-2xl border border-border p-5 shadow-soft"
-                style={{ transform: `rotate(${tilt(c, i) / 2}deg)` }}
-              >
-                <span className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-gold text-background shadow-soft">
-                  <Award className="h-5 w-5" />
-                </span>
-                <p className="font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
-                  {issuer}
-                </p>
-                <p className="mt-8 pr-2 font-display text-lg leading-snug font-bold">{name}</p>
-                <div className="mt-6 border-t border-dashed border-gold pt-2 font-hand text-lg text-muted-foreground">
-                  Kaneeza Batool
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* human */}
-      <section className="mx-auto max-w-6xl px-5 py-20">
-        <SectionHead eyebrow="Off the clock" title="The human behind the" accent="commits." />
-        <div className="mt-14 grid grid-cols-1 gap-8 px-2 sm:grid-cols-2 lg:grid-cols-5 lg:gap-5">
-          {smallThings.map(({ k, v, Icon }, i) => (
-            <figure
-              key={k}
-              className={`polaroid tiltable ${i % 2 ? "lg:mt-10" : ""}`}
-              style={{ ["--tilt" as string]: `${tilt(k, i)}deg` }}
+        {/* Letter */}
+        <section className="mx-auto max-w-3xl px-5 py-20">
+          <Guide line="one more thing." />
+          <Label>A letter to Kaneeza, Nov 2027</Label>
+          <div
+            data-tilt="soft"
+            className="paper relative mt-8 -rotate-1 rounded-sm border border-border p-8 shadow-lift md:p-12"
+          >
+            <span
+              className="pop-3 absolute -top-5 right-8 flex h-12 w-12 items-center justify-center rounded-full bg-primary font-display text-lg font-bold text-primary-foreground shadow-soft ring-4 ring-primary/30"
+              aria-hidden
             >
-              <span className="tape" aria-hidden />
-              <div className="relative flex aspect-square items-center justify-center overflow-hidden bg-soft">
-                <span className="absolute -top-6 -right-6 h-24 w-24 rounded-full bg-g1" />
-                <span className="absolute -bottom-8 -left-4 h-20 w-20 rounded-full bg-card" />
-                <Icon className="relative h-16 w-16 text-primary" strokeWidth={1.4} />
-              </div>
-              <p className="mt-2 font-mono text-[11px] text-primary">{k}</p>
-              <figcaption className="mt-1 font-hand text-xl leading-snug">{v}</figcaption>
-            </figure>
-          ))}
-        </div>
-      </section>
-
-      <Payoff days={days} total={total} repos={repos} />
-
-      {/* Letter */}
-      <section className="mx-auto max-w-3xl px-5 py-20">
-        <Guide line="one more thing." />
-        <Label>A letter to Kaneeza, Nov 2027</Label>
-        <div className="paper relative mt-8 -rotate-1 rounded-sm border border-border p-8 shadow-lift md:p-12">
-          <span className="absolute -top-5 right-8 flex h-12 w-12 items-center justify-center rounded-full bg-primary font-display text-lg font-bold text-primary-foreground shadow-soft ring-4 ring-primary/30">
-            K
-          </span>
-          <div className="space-y-3 font-hand text-2xl leading-snug md:text-3xl">
-            {letter.map((l) => (
-              <p key={l}>{l}</p>
-            ))}
-            <p className="pt-2 text-right">Kaneeza, Nov 2026</p>
+              K
+            </span>
+            <div className="pop-1 space-y-3 font-hand text-2xl leading-snug md:text-3xl">
+              {letter.map((l) => (
+                <p key={l}>{l}</p>
+              ))}
+              <p className="pt-2 text-right">Kaneeza, Nov 2026</p>
+            </div>
           </div>
-        </div>
-        <p className="mt-6 text-center text-sm text-muted-foreground">
-          I wrote a letter like this to my future self during the GWY Fellowship. This is the next
-          one.
-        </p>
-      </section>
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            I wrote a letter like this to my future self during the GWY Fellowship. This is the next
+            one.
+          </p>
+        </section>
 
-      <Contact />
+        <Contact />
+      </main>
 
-      <footer className="bg-ink py-8 text-center font-mono text-xs text-cream/70">
-        © 2026 kaneeza · made in sukkur, powered by chai ·{" "}
-        <a href="#top" className="underline-offset-4 hover:text-cream hover:underline">
+      <footer className="bg-ink py-6 text-center font-mono text-xs text-cream/75">
+        © 2026 kaneeza · Built with React, Tailwind and too many cups of chai{" "}
+        <span role="img" aria-label="chai cup">
+          ☕
+        </span>{" "}
+        ·{" "}
+        <a
+          href="#top"
+          className="inline-flex min-h-8 items-center underline-offset-4 hover:text-cream hover:underline"
+        >
           back to top
         </a>
       </footer>
@@ -1683,85 +1574,186 @@ function Index() {
   );
 }
 
-/* ---------- Journey ---------- */
-function Journey() {
+/* ---------- Journey: an interactive passport ---------- */
+function OrgVisualView({ v }: { v: OrgVisual }) {
+  switch (v) {
+    case "pr":
+      return <PrScreen />;
+    case "nexfellow":
+      return <NexFellowTrack />;
+    case "stamp":
+      return <Stamp />;
+    case "fellowship":
+      // Drawn for dark backgrounds: keep it on a small ink card on the cream page.
+      return (
+        <div className="rounded-xl bg-ink p-4 text-cream shadow-lift">
+          <FellowshipPath dark />
+        </div>
+      );
+    case "paklaw":
+      return <PakLawScreen />;
+    case "titan":
+      return <TitanScreen />;
+    case "elder":
+      return (
+        <div className="rounded-xl bg-card py-5 shadow-soft">
+          <ElderScreen />
+        </div>
+      );
+    case "jss":
+      return (
+        <div className="rounded-xl bg-card p-3 shadow-soft">
+          <JssScreen />
+        </div>
+      );
+    case "devweekends":
+      return (
+        <div aria-hidden className="grid grid-cols-4 gap-2 rounded-xl bg-card p-4 shadow-soft">
+          {[
+            ["M", "MongoDB"],
+            ["E", "Express"],
+            ["R", "React"],
+            ["N", "Node.js"],
+          ].map(([l, n]) => (
+            <div key={l} className="flex flex-col items-center gap-1 rounded-lg bg-background p-2">
+              <span className="font-display text-3xl font-bold text-primary">{l}</span>
+              <span className="font-mono text-[10px] text-muted-foreground">{n}</span>
+            </div>
+          ))}
+          <div className="col-span-4 flex items-center justify-center gap-2 rounded-lg bg-soft py-2 font-mono text-[11px]">
+            <Code2 className="h-3.5 w-3.5 text-primary" /> + DSA practice on LeetCode
+          </div>
+        </div>
+      );
+  }
+}
+
+function Journey({ temp }: { temp: number | null }) {
   const [sel, setSel] = useState(0);
   const o = orgs[sel] ?? orgs[0]!;
   return (
-    <section id="journey" className="grain-ink scroll-mt-20 text-cream">
+    <section id="journey" className="grain-ink stage scroll-mt-20 text-cream">
       <div className="mx-auto max-w-6xl px-5 py-24">
-        <SectionHead
-          dark
-          eyebrow="Journey"
-          title="Where I've"
-          accent="been."
-          sub="Fellowships, hackathons, an internship and a campus group. Pick one."
-        />
+        <div className="grid items-end gap-10 lg:grid-cols-[1fr_24rem]">
+          <SectionHead
+            dark
+            eyebrow="Journey"
+            title="Where I've"
+            accent="been."
+            sub="Built from Sukkur, with fellowships, hackathons, open source, an internship and a campus group. Pick one."
+          />
+          {/* The dotted world map (formerly its own "Reach" section). */}
+          <div className="hidden lg:block">
+            <HomeMap temp={temp} />
+          </div>
+        </div>
+
         <div className="mt-12 grid gap-6 lg:grid-cols-[19rem_1fr]">
-          <div className="scrollbar-none -mx-5 flex gap-2 overflow-x-auto px-5 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0">
+          {/* Organisations: each one is a small ink stamp that straightens when picked. */}
+          <div
+            className="scrollbar-none -mx-5 flex gap-2 overflow-x-auto px-5 py-1 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0"
+            role="group"
+            aria-label="Organisations"
+          >
             {orgs.map((g, i) => (
               <button
                 key={g.name}
                 type="button"
                 onClick={() => setSel(i)}
                 aria-pressed={sel === i}
-                className={`flex shrink-0 items-center gap-3 rounded-2xl border p-2.5 pr-4 text-left transition-colors ${
+                aria-controls="journey-panel"
+                className={`flex shrink-0 items-center gap-3 rounded-2xl border p-2 pr-4 text-left transition-colors ${
                   sel === i
-                    ? "border-primary bg-primary/15"
-                    : "border-cream/10 bg-cream/5 hover:border-cream/30"
+                    ? "border-primary bg-primary/20"
+                    : "border-cream/10 bg-cream/5 hover:border-cream/30 hover:bg-cream/10"
                 }`}
               >
-                <span
-                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-mono text-[10px] font-bold ${
-                    sel === i ? "bg-primary text-primary-foreground" : "bg-cream text-ink"
-                  }`}
-                >
-                  {g.short}
-                </span>
+                <MiniStamp org={g} i={i} active={sel === i} />
                 <span className="min-w-0">
                   <span className="block max-w-48 truncate text-sm font-medium lg:max-w-none lg:whitespace-normal">
                     {g.name}
                   </span>
-                  <span className="block font-mono text-[10px] text-cream/50">{g.when}</span>
+                  <span className="block font-mono text-[10px] text-cream/70">{g.when}</span>
                 </span>
               </button>
             ))}
           </div>
 
+          {/* The picked organisation as a visa page, with its stamp thumped on. */}
           <article
+            id="journey-panel"
             key={o.name}
-            className="fade-in visible overflow-hidden rounded-3xl border border-cream/15 bg-cream/5"
+            aria-live="polite"
+            className="passport-cover visa-in self-start"
           >
-            <div className="grid gap-6 p-6 md:p-8 xl:grid-cols-[1fr_1.1fr]">
-              <div>
-                <div className="flex items-center gap-3">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary font-mono text-xs font-bold text-primary-foreground">
-                    {o.short}
-                  </span>
-                  <div>
-                    <h3 className="font-display text-2xl leading-tight font-bold">{o.name}</h3>
-                    <p className="font-mono text-xs text-cream/60">{o.when}</p>
+            <div className="passport-page">
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="font-mono text-[11px] tracking-widest text-ink/60 uppercase">
+                    Visa · entry {sel + 1} of {orgs.length}
+                  </p>
+                  <h3 className="mt-2 font-display text-2xl leading-tight font-bold text-ink md:text-3xl">
+                    {o.name}
+                  </h3>
+                  <p className="mt-1 font-mono text-xs text-ink/60">{o.when}</p>
+                  <p className="mt-4 inline-flex items-center gap-2 rounded-full bg-soft px-3 py-1 font-mono text-xs text-primary-hover">
+                    <Briefcase className="h-3.5 w-3.5" aria-hidden /> {o.role}
+                  </p>
+                </div>
+                <InkStamp org={o} i={sel} className="w-24 shrink-0 sm:w-32" />
+              </div>
+
+              <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_1.1fr]">
+                <div>
+                  <p className="text-sm leading-relaxed text-ink/80">{o.what}</p>
+                  {o.result && (
+                    <p className="mt-5 flex gap-2 rounded-2xl bg-soft px-3 py-2.5 text-sm font-medium text-primary-hover">
+                      <Trophy className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> {o.result}
+                    </p>
+                  )}
+                  <p className="mt-5 border-l-2 border-dashed border-primary/50 pl-3">
+                    <span className="block font-mono text-[10px] tracking-widest text-ink/75 uppercase">
+                      What it taught me
+                    </span>
+                    <span className="mt-1 block font-hand text-xl leading-snug text-primary-hover">
+                      {o.learned}
+                    </span>
+                  </p>
+                  {o.badge && (
+                    <a
+                      href={o.badge.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn-3d mt-5 inline-flex min-h-10 items-center gap-2 rounded-full bg-primary-hover px-4 text-sm font-medium text-primary-foreground hover:bg-primary"
+                    >
+                      <GitMerge className="h-4 w-4" aria-hidden /> {o.badge.label}
+                      <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
+                    </a>
+                  )}
+                </div>
+                <div className="flex items-center">
+                  <div className="w-full">
+                    <OrgVisualView v={o.visual} />
                   </div>
                 </div>
-                <p className="mt-5 inline-flex items-center gap-2 rounded-full bg-cream/10 px-3 py-1 font-mono text-xs">
-                  <Briefcase className="h-3.5 w-3.5 text-primary" /> {o.role}
-                </p>
-                <p className="mt-4 text-sm leading-relaxed text-cream/75">{o.what}</p>
-                <p className="mt-5 flex gap-2 rounded-2xl bg-primary/20 px-3 py-2.5 text-sm font-medium">
-                  <Trophy className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> {o.result}
-                </p>
               </div>
-              <div className="flex items-center">
-                <div className="w-full">{o.visual()}</div>
+
+              <div
+                className="mt-7 grid border-t border-dashed border-ink/20"
+                style={{ gridTemplateColumns: `repeat(${o.stats.length}, minmax(0, 1fr))` }}
+              >
+                {o.stats.map(([n, l]) => (
+                  <div
+                    key={l}
+                    className="border-dashed border-ink/20 pt-4 pr-3 not-last:border-r not-first:pl-4"
+                  >
+                    <p className="font-display text-2xl font-bold text-primary-hover sm:text-3xl">
+                      {n}
+                    </p>
+                    <p className="text-xs text-ink/65">{l}</p>
+                  </div>
+                ))}
               </div>
-            </div>
-            <div className="grid grid-cols-2 border-t border-cream/10 sm:grid-cols-3">
-              {o.stats.map(([n, l]) => (
-                <div key={l} className="border-cream/10 p-5 not-last:border-r">
-                  <p className="font-display text-3xl font-bold text-primary">{n}</p>
-                  <p className="text-xs text-cream/60">{l}</p>
-                </div>
-              ))}
             </div>
           </article>
         </div>
@@ -1770,75 +1762,121 @@ function Journey() {
   );
 }
 
-/* ---------- Map ---------- */
-function MapSection({ temp }: { temp: number | null }) {
-  const facts = [
-    {
-      n: 35,
-      s: "+",
-      l: "countries at DoraHacks 2.0",
-      d: "6,000+ applications, 500 teams selected",
-    },
-    {
-      n: 30,
-      s: "+",
-      l: "countries in GWY Fellowship 2.0",
-      d: "a global fellowship for women in AI",
-    },
-    { n: 324, s: "", l: "teams at USAII Global AI Hackathon", d: "ElderBridge reached Round 2" },
-  ];
+/* ---------- Home base map (shown in the Journey header on large screens) ---------- */
+function HomeMap({ temp }: { temp: number | null }) {
   return (
-    <section className="mx-auto max-w-6xl px-5 py-24">
-      <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
-        <SectionHead eyebrow="Reach" title="From Sukkur to the" accent="world." />
-        <p className="max-w-sm text-muted-foreground">
-          Built from a small city in Sindh, alongside teams and fellows from dozens of countries.
-        </p>
-      </div>
-      <div className="relative mt-10 overflow-hidden rounded-3xl border border-border bg-card p-4 shadow-soft md:p-8">
-        <WorldMap className="w-full" />
-        <div className="absolute top-[47%] left-[71%] hidden md:block">
-          <div className="ml-6 w-56 rounded-2xl border border-border bg-background p-3 shadow-lift">
-            <p className="flex items-center gap-1.5 font-mono text-[11px] text-primary uppercase">
-              <MapPin className="h-3.5 w-3.5" /> home base
-            </p>
-            <p className="mt-1 font-display text-lg font-bold">Sukkur, Pakistan</p>
-            <p className="text-xs text-muted-foreground">
-              Sukkur IBA{temp !== null ? ` · ${temp}°C right now` : ""}
-            </p>
+    <figure className="rounded-2xl border border-cream/15 bg-cream/5 p-3">
+      <WorldMap className="w-full" />
+      <figcaption className="mt-2 flex items-center justify-between gap-2 px-1 font-mono text-[11px] text-cream/70">
+        <span className="flex items-center gap-1.5">
+          <MapPin className="h-3.5 w-3.5 text-g2" aria-hidden /> home base: Sukkur, Pakistan
+        </span>
+        {temp !== null && <span>{temp}°C right now</span>}
+      </figcaption>
+    </figure>
+  );
+}
+
+/* ---------- Now (closes the payoff section) ---------- */
+function NowPanel() {
+  const icons = [Brain, Code2];
+  return (
+    <div className="mt-16 border-t border-cream/10 pt-14">
+      <Commit msg="feat: AI happened" dark />
+      <h3 className="extrude-dark font-display text-3xl font-bold md:text-4xl">
+        This chapter is still being written.
+        <span className="caret ml-1 text-primary" aria-hidden>
+          |
+        </span>
+      </h3>
+      <div className="mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+        <div className="overflow-hidden rounded-2xl border border-cream/15 bg-ink/70 shadow-[0_30px_60px_-30px_oklch(0_0_0/0.8)]">
+          <div className="flex items-center gap-1.5 border-b border-cream/10 px-4 py-3" aria-hidden>
+            <span className="h-2.5 w-2.5 rounded-full bg-primary" />
+            <span className="h-2.5 w-2.5 rounded-full bg-gold" />
+            <span className="h-2.5 w-2.5 rounded-full bg-cream/40" />
+            <span className="ml-3 font-mono text-xs text-cream/70">~/kaneeza/now</span>
           </div>
+          <dl className="space-y-3 p-5 font-mono text-sm md:p-6">
+            {terminal.map(([k, v]) => (
+              <div key={k} className="grid gap-1 sm:grid-cols-[8.5rem_1fr] sm:gap-4">
+                <dt className="text-g2">{k}</dt>
+                <dd>{v}</dd>
+              </div>
+            ))}
+            <p className="pt-2 text-cream/70" aria-hidden>
+              $ <span className="caret">▍</span>
+            </p>
+          </dl>
+        </div>
+        <div className="flex flex-col gap-3">
+          <p className="font-medium">Follow the work as it happens</p>
+          {followRepos.map(({ repo, line }, i) => {
+            const I = icons[i] ?? Code2;
+            return (
+              <a
+                key={repo}
+                href={`${LINKS.github}/${repo}`}
+                target="_blank"
+                rel="noreferrer"
+                data-tilt
+                className="group flex items-center gap-4 rounded-2xl border border-cream/15 bg-cream/5 p-4 transition-colors hover:border-primary hover:bg-primary/10"
+              >
+                <span className="pop-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-hover text-primary-foreground shadow-[0_8px_16px_-8px_oklch(0_0_0/0.7)]">
+                  <I className="h-5 w-5" aria-hidden />
+                </span>
+                <span className="pop-1 min-w-0 flex-1">
+                  <span className="block truncate font-mono text-sm">{repo}</span>
+                  <span className="block text-xs text-cream/70">{line}</span>
+                </span>
+                <ArrowUpRight
+                  className="h-4 w-4 text-cream/60 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-g2"
+                  aria-hidden
+                />
+              </a>
+            );
+          })}
         </div>
       </div>
-      <div className="mt-4 grid gap-4 md:grid-cols-3">
-        {facts.map((f) => (
-          <div key={f.l} className="rounded-3xl border border-border bg-background p-5 shadow-soft">
-            <p className="font-display text-4xl font-bold text-primary">
-              <CountUp to={f.n} suffix={f.s} />
-            </p>
-            <p className="mt-1 font-medium">{f.l}</p>
-            <p className="text-sm text-muted-foreground">{f.d}</p>
-          </div>
-        ))}
-      </div>
-    </section>
+    </div>
   );
 }
 
 /* ---------- Work ---------- */
 function Work() {
   const [f, setF] = useState<"all" | Kind>("all");
+  const [expanded, setExpanded] = useState(false);
   const rest = allProjects.filter((p) => p !== aura && (f === "all" || p.kind === f));
+  // Collapsed ("All" only): the featured card plus two more (three on desktop, filling a
+  // row). Every card stays in the DOM so links from the story can always reach it.
+  const collapsed = f === "all" && !expanded;
+  // A "see full card" link from the story may target a card the filter or the collapse
+  // hides: show everything, then scroll to it once it's rendered.
+  useEffect(() => {
+    const onHash = () => {
+      const id = window.location.hash.slice(1);
+      if (!id.startsWith("project-")) return;
+      setF("all");
+      setExpanded(true);
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView()),
+      );
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
   return (
     <section id="work" className="mx-auto max-w-6xl scroll-mt-20 px-5 py-24">
       <div className="flex flex-wrap items-end justify-between gap-6">
         <SectionHead eyebrow="All work" title="Everything I've" accent="built so far." />
-        <div className="flex gap-2 font-mono text-sm">
+        <div className="flex gap-2 font-mono text-sm" role="group" aria-label="Filter projects">
           {(["all", "ai", "web"] as const).map((k) => (
             <button
               key={k}
               type="button"
               onClick={() => setF(k)}
-              className={`rounded-full border px-4 py-1.5 transition-colors ${f === k ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:bg-soft"}`}
+              aria-pressed={f === k}
+              className={`min-h-9 rounded-full border px-4 transition-colors ${f === k ? "border-primary-hover bg-primary-hover text-primary-foreground" : "border-border bg-card hover:bg-soft"}`}
             >
               {k === "all" ? "All" : k === "ai" ? "AI" : "Web"}
             </button>
@@ -1850,29 +1888,172 @@ function Work() {
           <ProjectCard p={aura} big />
         </div>
       )}
-      <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {rest.map((p) => (
-          <FadeIn key={p.title}>
-            <ProjectCard p={p} />
-          </FadeIn>
+      <div id="work-grid" className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {rest.map((p, i) => (
+          <div
+            key={p.title}
+            hidden={collapsed && i >= 3}
+            className={collapsed && i === 2 ? "hidden lg:block" : undefined}
+          >
+            <FadeIn>
+              <ProjectCard p={p} />
+            </FadeIn>
+          </div>
         ))}
+      </div>
+      {f === "all" && rest.length > 2 && (
+        <div className="mt-8 flex justify-center">
+          <button
+            type="button"
+            onClick={() => {
+              if (expanded) document.getElementById("work")?.scrollIntoView();
+              setExpanded(!expanded);
+            }}
+            aria-expanded={expanded}
+            aria-controls="work-grid"
+            className="btn-3d btn-3d-light inline-flex min-h-10 items-center gap-2 rounded-full border border-primary bg-background px-5 font-mono text-sm text-primary-hover hover:bg-soft"
+          >
+            {expanded ? "Show fewer" : `Show all ${allProjects.length} projects`}
+          </button>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ---------- Tools + certificates ---------- */
+function Tools() {
+  return (
+    <section className="mx-auto max-w-6xl px-5 py-16">
+      <SectionHead eyebrow="Tools" title="What's on my" accent="keyboard." />
+      <div className="mt-10 grid gap-8 md:grid-cols-[10rem_1fr] md:items-start">
+        <p className="font-display text-lg font-bold">I build with</p>
+        <ul className="flex flex-wrap gap-2.5">
+          {toolsBuild.map((t) => (
+            <li key={t} className="keycap">
+              {t}
+            </li>
+          ))}
+        </ul>
+        <p className="font-display text-lg font-bold">I am learning</p>
+        <ul className="flex flex-wrap gap-2.5">
+          {toolsLearn.map((t) => (
+            <li key={t} className="keycap keycap-ghost">
+              {t}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="mt-16 flex items-end justify-between gap-4">
+        <div>
+          <Label>Certificates</Label>
+          <p className="mt-2 font-display text-2xl font-bold">
+            {certificates.length} certificates and courses
+          </p>
+        </div>
+        <span className="hidden font-mono text-xs text-muted-foreground sm:inline" aria-hidden>
+          scroll →
+        </span>
+      </div>
+      <ul
+        className="edge-fade scrollbar-none -mx-5 mt-6 flex snap-x gap-4 overflow-x-auto px-5 pt-4 pb-8"
+        aria-label="Certificates"
+      >
+        {certificates.map((c, i) => {
+          const m = /^(.*) \((.*)\)$/.exec(c);
+          const name = m?.[1] ?? c;
+          const issuer = m?.[2] ?? "DataCamp";
+          return (
+            <li
+              key={c}
+              data-tilt
+              className="paper tiltable relative w-64 shrink-0 snap-start rounded-2xl border border-border p-5 shadow-soft"
+              style={{ ["--tilt" as string]: `${tilt(c, i) / 2}deg` }}
+            >
+              <span
+                className="pop-3 absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-gold text-background shadow-soft"
+                aria-hidden
+              >
+                <Award className="h-5 w-5" />
+              </span>
+              <p className="font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
+                {issuer}
+              </p>
+              <p className="pop-2 mt-8 pr-2 font-display text-lg leading-snug font-bold">{name}</p>
+              <div
+                className="mt-6 border-t border-dashed border-gold pt-2 font-hand text-lg text-muted-foreground"
+                aria-hidden
+              >
+                Kaneeza Batool
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
+/* ---------- Payoff: one year later ---------- */
+function Payoff({ gh }: { gh: GitHubData }) {
+  const { days, total, repos, snapshot } = gh;
+  return (
+    <section className="grain-ink stage text-cream">
+      <div className="mx-auto max-w-6xl px-5 py-24">
+        <Label className="text-cream/70">The payoff</Label>
+        <p className="mt-6 font-mono text-sm text-cream/70 line-through decoration-primary decoration-2">
+          {TYPED}
+        </p>
+        <h2 className="extrude-dark scroll-3d mt-2 font-display text-5xl leading-[1.02] font-bold md:text-7xl">
+          One year <span className="font-hand text-6xl text-primary md:text-8xl">later.</span>
+        </h2>
+        <div className="scroll-3d mt-10 rounded-3xl bg-cream p-5 text-ink shadow-[0_40px_80px_-30px_oklch(0_0_0/0.85),0_0_0_1px_oklch(1_0_0/0.06)] md:p-7">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <span className="flex items-center gap-3">
+              <Github className="h-5 w-5" aria-hidden />
+              <span className="font-mono text-sm">github.com/{GH}</span>
+            </span>
+            <span className="font-hand text-2xl leading-none text-primary">
+              same graph. it grew a skyline.
+            </span>
+          </div>
+          <Skyline
+            days={days}
+            label={`3D skyline of my GitHub year: one block per day, ${total ?? 0} contributions in total.`}
+          />
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-muted-foreground">
+            <span aria-live="polite">
+              <span className="font-medium text-primary-hover">{repos} repositories</span>
+              {" · "}
+              {days ? `${total ?? 0} contributions` : "Loading GitHub…"}
+              {snapshot && <span> (saved {snapshot})</span>}
+            </span>
+            <span aria-hidden>← drag to rotate →</span>
+          </div>
+        </div>
+        <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-cream/15 bg-cream/15 sm:grid-cols-3 lg:grid-cols-6">
+          {payoffStats.map(({ id, to, prefix, suffix, label, Icon }) => (
+            <div key={label} data-tilt className="flex flex-col gap-2 bg-ink p-5">
+              <Icon className="pop-2 h-5 w-5 text-g2" aria-hidden />
+              <p className="pop-3 font-display text-3xl font-bold">
+                <CountUp
+                  to={id === "repos" ? gh.repos : to}
+                  prefix={prefix ?? ""}
+                  suffix={suffix ?? ""}
+                />
+              </p>
+              <p className="pop-1 text-xs leading-snug text-cream/70">{label}</p>
+            </div>
+          ))}
+        </div>
+        <NowPanel />
       </div>
     </section>
   );
 }
 
 /* ---------- Contact ---------- */
-const marquee = [
-  "full-stack",
-  "applied AI",
-  "community",
-  "chai",
-  "sukkur",
-  "open source",
-  "DSA daily",
-  "learning in public",
-];
-
 function Contact() {
   const [clicks, setClicks] = useState(0);
   const [wiggle, setWiggle] = useState(false);
@@ -1885,64 +2066,97 @@ function Contact() {
       window.setTimeout(() => setWiggle(false), 5000);
     } else setClicks(n);
   };
+  const links = [
+    { label: "LinkedIn", href: LINKS.linkedin, Icon: Linkedin },
+    { label: "GitHub", href: LINKS.github, Icon: Github },
+    { label: "LeetCode", href: LINKS.leetcode, Icon: Code2 },
+  ];
   return (
     <section id="contact" className="scroll-mt-20">
-      <div className="mx-auto max-w-6xl px-5 py-24 text-center">
+      <div className="relative mx-auto max-w-6xl px-5 py-24 text-center">
         <button
           type="button"
           onClick={onAvatar}
           aria-label="Kaneeza's avatar"
-          className="mx-auto block rounded-full"
+          className="coin mx-auto block rounded-full perspective-[600px]"
         >
           <img
             src={avatar}
-            alt="Illustrated avatar of Kaneeza"
+            alt=""
+            width={112}
+            height={112}
+            loading="lazy"
             className={`h-28 w-28 rounded-full bg-ink object-cover shadow-lift ring-4 ring-primary ring-offset-4 ring-offset-background ${wiggle ? "wiggle" : ""}`}
           />
         </button>
         <p className="mt-8 font-hand text-3xl text-primary">Kaneeza Batool</p>
-        <h2 className="mt-2 font-display text-5xl leading-[1.02] font-bold md:text-7xl">
+        <h2 className="extrude scroll-3d mt-2 font-display text-5xl leading-[1.02] font-bold md:text-7xl">
           Let's build what's next,{" "}
           <span className="font-hand text-6xl text-primary md:text-8xl">together.</span>
         </h2>
         <p className="mt-5 text-lg text-muted-foreground">i don't know. let's figure it out.</p>
-        <a
-          href={`mailto:${EMAIL}`}
-          className="mt-8 inline-flex max-w-full items-center gap-2 rounded-full bg-primary px-6 py-3.5 text-sm font-medium break-all text-primary-foreground shadow-lift hover:bg-primary-hover sm:text-base"
-        >
-          <Mail className="h-4 w-4 shrink-0" /> {EMAIL}
-        </a>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <a
+            href={`mailto:${EMAIL}`}
+            className="btn-3d inline-flex max-w-full items-center gap-2 rounded-full bg-primary px-6 py-3.5 text-sm font-medium break-all text-primary-foreground hover:bg-primary-hover sm:text-base"
+          >
+            <Mail className="h-4 w-4 shrink-0" aria-hidden /> {EMAIL}
+          </a>
+          <a
+            href={CV_URL}
+            download
+            className="btn-3d btn-3d-light inline-flex items-center gap-2 rounded-full border-2 border-primary-hover bg-background px-6 py-3 text-sm font-medium text-primary-hover hover:bg-soft sm:text-base"
+          >
+            <Download className="h-4 w-4 shrink-0" aria-hidden /> Download CV
+          </a>
+        </div>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
-          {LINKS.map(({ label, href, Icon }) => (
+          {links.map(({ label, href, Icon }) => (
             <a
               key={label}
               href={href}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 font-mono text-sm transition-colors hover:border-primary hover:text-primary"
+              className="btn-3d btn-3d-light inline-flex min-h-10 items-center gap-2 rounded-full border border-border bg-card px-4 font-mono text-sm hover:border-primary hover:text-primary-hover"
             >
-              <Icon className="h-4 w-4" /> {label}
+              <Icon className="h-4 w-4" aria-hidden /> {label}
             </a>
           ))}
         </div>
       </div>
-      <div
-        className="overflow-hidden border-y border-border bg-primary py-4 text-primary-foreground"
-        aria-hidden
-      >
-        <div className="marquee">
-          {[0, 1].map((r) => (
-            <div key={r} className="flex shrink-0">
-              {marquee.concat(marquee).map((w, i) => (
-                <span
-                  key={i}
-                  className="flex items-center gap-6 px-3 font-display text-2xl font-bold whitespace-nowrap"
-                >
-                  {w} <span className="font-hand text-3xl text-primary-foreground/60">✦</span>
-                </span>
-              ))}
-            </div>
-          ))}
+      {/* Two crossed ribbons running in opposite directions. */}
+      <div className="ribbons" aria-hidden>
+        <div className="ribbon-back overflow-hidden bg-ink py-3 text-cream/80">
+          <div className="marquee marquee-reverse">
+            {[0, 1].map((r) => (
+              <div key={r} className="flex shrink-0">
+                {marquee.concat(marquee).map((w, i) => (
+                  <span
+                    key={i}
+                    className="flex items-center gap-6 px-3 font-mono text-sm tracking-widest whitespace-nowrap uppercase"
+                  >
+                    {w} <span className="text-g2">✦</span>
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="ribbon overflow-hidden border-y border-primary-hover bg-primary py-4 text-primary-foreground">
+          <div className="marquee">
+            {[0, 1].map((r) => (
+              <div key={r} className="flex shrink-0">
+                {marquee.concat(marquee).map((w, i) => (
+                  <span
+                    key={i}
+                    className="flex items-center gap-6 px-3 font-display text-2xl font-bold whitespace-nowrap"
+                  >
+                    {w} <span className="font-hand text-3xl text-primary-foreground/60">✦</span>
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

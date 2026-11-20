@@ -34,10 +34,10 @@ The hero shows an empty GitHub contribution graph from November 2025. As you scr
 <table>
   <tr>
     <td width="50%"><img src="docs/screenshots/what-i-do.png" alt="Four cards: I build, I make AI do real work, I bring people along, I learn in public" /><br /><sub><b>What I do</b>: four cards, each with its own illustration</sub></td>
-    <td width="50%"><img src="docs/screenshots/journey.png" alt="Journey section with a list of organizations and a detail panel" /><br /><sub><b>Journey</b>: click through fellowships, hackathons and an internship</sub></td>
+    <td width="50%"><img src="docs/screenshots/journey.png" alt="Journey section: a list of organisations as ink stamps beside a passport visa page with the selected one's details and stamp" /><br /><sub><b>Journey</b>: a passport, one stamped visa page per fellowship, hackathon or internship</sub></td>
   </tr>
   <tr>
-    <td width="50%"><img src="docs/screenshots/reach.png" alt="Dotted world map with Sukkur, Pakistan highlighted, plus stat cards" /><br /><sub><b>Reach</b>: dotted world map with a live pin on Sukkur</sub></td>
+    <td width="50%"><img src="docs/screenshots/about.png" alt="About me: 'Hi, I'm Kaneeza.' beside a chat window where a visitor asks questions and Kaneeza answers" /><br /><sub><b>About me</b>: the person behind the commits, as a chat</sub></td>
     <td width="50%"><img src="docs/screenshots/payoff.png" alt="One year later: the filled contribution graph and six stats" /><br /><sub><b>The payoff</b>: the same graph, filled, with live GitHub numbers</sub></td>
   </tr>
   <tr>
@@ -59,16 +59,18 @@ The hero shows an empty GitHub contribution graph from November 2025. As you scr
 
 ## Features
 
-- **Scroll-driven storytelling.** The contribution graph fills in as each chapter scrolls into view: a sticky sidebar on desktop, a sticky bar on mobile.
+- **Scroll-driven storytelling.** The contribution graph fills in as each chapter scrolls into view: a sticky sidebar on desktop, a sticky bar on mobile. It's drawn on a `<canvas>`, so 365 days cost one element instead of 365.
 - **Live data, no backend.**
   - Contribution history from the [GitHub Contributions API](https://github-contributions-api.jogruber.de).
   - Public repository count from the [GitHub REST API](https://docs.github.com/en/rest/users/users#get-a-user).
   - Current temperature in Sukkur from [Open-Meteo](https://open-meteo.com).
-  - Each one falls back gracefully if its request fails.
-- **Illustrated project screens.** Each project card shows a hand-built UI mockup made with React and Tailwind (agents and scorecard for auraCheck, portals and QR ID card for TITAN, and so on). They're code, not images, so they stay sharp at any size.
-- **Generated world map.** The dotted map was generated once with [`dotted-map`](https://www.npmjs.com/package/dotted-map) and embedded as about 600 bytes of hex. The library isn't shipped to visitors.
-- **Small details.** Sticky notes, polaroids, a corkboard, keyboard-key tool chips, a rotating stamp, a letter to my future self, and a hidden easter egg (click the avatar near the bottom of the page three times).
-- **Accessible motion.** Every animation turns off under `prefers-reduced-motion`. The page uses semantic HTML, alt text and keyboard-reachable controls throughout.
+  - Every request times out after 8 seconds. If GitHub data can't load, the page falls back to a saved snapshot, so the "one year later" payoff never shows an empty graph.
+- **Illustrated project screens.** Each project card shows a hand-built UI mockup made with React and Tailwind (agents and scorecard for auraCheck, portals and QR ID card for TITAN, the merged PR for WoCS, and so on). They're code, not images, so they stay sharp at any size.
+- **Generated world map.** The dotted map was generated once with [`dotted-map`](https://www.npmjs.com/package/dotted-map) and saved as a single static SVG (2 KB compressed). Only the twinkling dots and the Sukkur pin are live elements.
+- **Small details.** A "Currently" sticky note, passport ink stamps, an About-me chat, polaroids, keyboard-key tool chips, a rotating stamp, a letter to my future self, a scrapbook 404 page, and a hidden easter egg (click the avatar near the bottom of the page three times).
+- **Accessible.** Lighthouse accessibility score of 100: AA contrast within the theme colors, a skip link, labelled links and controls, decorative mockups hidden from screen readers, and every animation turned off under `prefers-reduced-motion`.
+- **Fast.** Self-hosted fonts, a WebP avatar, and looping animations that pause while their section is off screen. Lighthouse performance on desktop: 96.
+- **Shareable.** A 1200×630 preview image, Open Graph and Twitter tags, a canonical URL, a sitemap, and schema.org `Person` data for search results.
 - **Server-side rendering** with TanStack Start, deployed on Vercel.
 
 ## Tech stack
@@ -78,7 +80,7 @@ The hero shows an empty GitHub contribution graph from November 2025. As you scr
 | Framework | React 19, TanStack Start (SSR) and TanStack Router (file-based routes) |
 | Language | TypeScript (strict mode) |
 | Styling | Tailwind CSS 4, Lightning CSS, custom design tokens in `oklch` |
-| Typography | Fraunces (display), Inter (body), JetBrains Mono (code), Caveat (handwriting) |
+| Typography | Fraunces (display), Inter (body), JetBrains Mono (code), Caveat (handwriting), self-hosted via Fontsource |
 | Icons | lucide-react |
 | Build | Vite 8 |
 | Hosting | Vercel, built through Nitro (which also supports other hosts through presets) |
@@ -132,35 +134,44 @@ node .output/server/index.mjs           # http://localhost:3000
 
 ```
 src/
+├── content.ts              # All text and data: projects, chapters, journey, stats
 ├── routes/
-│   ├── __root.tsx          # HTML shell, fonts, meta, 404 and error pages
-│   └── index.tsx           # The portfolio: content data + every section
+│   ├── __root.tsx          # HTML shell, meta, 404 and error pages
+│   └── index.tsx           # The page: every section's layout
 ├── components/
-│   ├── visuals.tsx         # Project screen mockups, agent diagram, dotted world map
-│   └── ui/                 # shadcn/ui primitives
-├── assets/
-│   └── kaneeza-avatar.png
-├── styles.css              # Design tokens, textures and animations
-├── server.ts               # SSR entry with error handling
-└── router.tsx
-public/                     # favicon, robots.txt
+│   ├── visuals.tsx         # Screen mockups, PR card, agent diagram, world map
+│   └── ui/sonner.tsx       # Toast (used by the easter egg)
+├── lib/
+│   └── live-data.ts        # GitHub + weather fetching, with snapshot fallback
+├── data/
+│   └── github-snapshot.ts  # Saved contribution history (fallback only)
+├── assets/                 # Avatar (WebP) and the static world-map SVG
+├── test/                   # Vitest: routing, content rules, page render offline
+├── styles.css              # Fonts, design tokens, textures and animations
+└── server.ts               # SSR entry with error handling
+public/                     # CV, favicon, share image, robots.txt, sitemap.xml
 docs/screenshots/           # Images used in this README
 ```
 
 ## Editing content
 
-All content lives as typed data at the top of [`src/routes/index.tsx`](src/routes/index.tsx), so updating the site doesn't require touching any layout code.
+All content lives in [`src/content.ts`](src/content.ts), so updating the site doesn't require touching any layout code.
 
-| To change… | Edit |
+| To change… | Edit in `content.ts` |
 | --- | --- |
 | Projects | `titan`, `aura`, `paklaw`, `elder`, `jss`, `dexo` (and `allProjects` for the order) |
-| Story chapters | `chapters` |
-| Journey panels | `orgs` |
-| Payoff stats | `heroStats` |
+| Story chapters | `chapters`, plus `aws`, `gwy` and `communityRoles` for chapter 4 |
+| Journey panels | `orgs` (the first one is selected by default) |
+| "Now" terminal | `terminal`, `followRepos` |
+| Payoff stats | `payoffStats` |
 | Tools and certificates | `toolsBuild`, `toolsLearn`, `certificates` |
-| GitHub username and email | `GH`, `EMAIL`, `LINKS` |
+| Links, email, CV | `LINKS`, `EMAIL`, `CV_URL` |
 
-Colors are defined once as tokens in [`src/styles.css`](src/styles.css): a cream background, rose `--primary`, deep `--ink` and `--gold`.
+**Updating the CV:** replace `public/Kaneeza_Batool_CV.pdf` (keep the file name, or update `CV_URL`).
+
+**Refreshing the GitHub snapshot:** the live graph never needs this. The snapshot is only the fallback for when the API is down. To update it, regenerate `src/data/github-snapshot.ts` from `https://github-contributions-api.jogruber.de/v4/kaneeza-batool?y=last` (levels as one digit per day, counts comma-separated).
+
+Colors are defined once as tokens in [`src/styles.css`](src/styles.css): a cream background, rose `--primary` (and the darker `--primary-hover`, used for small text so it meets contrast rules), deep `--ink` and `--gold`.
 
 ---
 
